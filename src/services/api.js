@@ -1,16 +1,15 @@
 import axios from 'axios';
-import store from '../redux/store';
 
 const API = axios.create({
   baseURL: 'http://localhost:5555/api',
 });
 
-API.interceptors.request.use((req) => {
-  const token = store.getState().user.token;
+API.interceptors.request.use((config) => {
+  const token = localStorage.getItem('accessToken');
   if (token) {
-    req.headers.Authorization = `Bearer ${token}`;
+    config.headers.Authorization = `Bearer ${token}`;
   }
-  return req;
+  return config;
 });
 
 export default API;

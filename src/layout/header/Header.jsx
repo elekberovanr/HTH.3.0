@@ -28,8 +28,9 @@ function Header() {
         <nav className={styles.nav}>
           {user ? (
             <>
-              <Link to="/add">+ Məhsul</Link>
-              <span className={styles.username}>Salam, {user.username}</span>
+              <Link to="/add">+Add</Link>
+              <Link to="/chat">Chat</Link>
+              <Link to="/profile">Profil</Link>
               <button onClick={handleLogout}>Çıxış</button>
             </>
           ) : (

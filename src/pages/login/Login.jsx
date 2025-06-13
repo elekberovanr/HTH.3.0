@@ -15,24 +15,25 @@ function Login() {
   };
 
   const dispatch = useDispatch();
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const res = await API.post('/auth/login', form);
+    const token = res.data.token;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await API.post('/auth/login', form);
-      const token = res.data.token;
-  
-      dispatch(setToken(token)); // Redux + localStorage
-      const userRes = await API.get('/auth/me'); // Tokenlə istifadəçi məlumatı
-      dispatch(setUser(userRes.data)); // Redux state-ə yaz
-  
-      alert('Daxil oldun!');
-      navigate('/');
-    } catch (err) {
-      alert(err.response?.data?.error || 'Xəta baş verdi');
-    }
-  };
-  
+    localStorage.setItem("accessToken", token); // Əlavə etdik
+    dispatch(setToken(token));
+
+    const userRes = await API.get('/auth/me');
+    dispatch(setUser(userRes.data));
+
+    alert('Daxil oldun!');
+    navigate('/');
+  } catch (err) {
+    console.error(err); // Debug üçün konsola yaz
+    alert(err?.response?.data?.error || 'Xəta baş verdi');
+  }
+};
 
   return (
     <div className={styles.container}>
