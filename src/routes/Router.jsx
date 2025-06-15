@@ -8,7 +8,9 @@ import AddProduct from '../pages/add/AddProduct'
 import Profile from '../pages/profile/Profile'
 import ProfileEdit from '../pages/profile/profileEdit/ProfileEdit'
 import EditProduct from '../pages/profile/editProduct/EditProduct'
-import ChatPage from '../pages/chat/ChatPage'
+import UserProfile from '../pages/user/UserProfile'
+import ChatRoom from '../pages/chat/chatRoom/ChatRoom'
+import ChatPage from '../pages/chat/chatPage/ChatPage'
 
 const Router = () => {
     return (
@@ -17,14 +19,17 @@ const Router = () => {
                 <Route path='/' element={<Layout />}>
                     <Route path='/' element={<Home />}></Route>
                     <Route path='/login' element={<Login />}></Route>
-                    <Route path='/register' element={<Register/>}></Route>
-                    <Route path='/add' element={<AddProduct/>}></Route>
-                    <Route path='/profile' element={<Profile/>}></Route>
-                    <Route path='/profile/edit' element={<ProfileEdit/>}></Route>
-                    <Route path="/edit-product/:id" element={<EditProduct />} />
-                    <Route path='/chat' element={<ChatPage/>}></Route>
+                    <Route path='/register' element={<Register />}></Route>
+                    <Route path='/add' element={<AddProduct />}></Route>
+                    <Route path='/profile' element={<Profile />}></Route>
+                    <Route path='/profile/edit' element={<ProfileEdit />}></Route>
+                    <Route path='/chat' element={<ChatPage />}></Route>
+                    <Route path="/profile/edit/:id" element={<EditProduct />} />
+                     <Route path='/chat/:id' element={<ChatRoom/>}></Route>
+                    <Route path="/user/:id" element={<UserProfile />} />
 
-                
+
+
                 </Route>
             </Routes>
 

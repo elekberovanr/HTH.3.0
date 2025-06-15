@@ -1,29 +1,22 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import styles from './Products.module.css';
+import ProductCard from '../../../components/product/ProductCard';
 import { fetchProducts } from '../../../redux/reducers/productSlice';
 
-function Products() {
+const Products = () => {
   const dispatch = useDispatch();
-  const { items: products, loading, error } = useSelector((state) => state.products);
+  const { items: products } = useSelector(state => state.products);
 
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
-  if (loading) return <p>Yüklənir...</p>;
-  if (error) return <p>Xəta: {error}</p>;
-
   return (
-    <div className={styles.grid}>
-      {products.map((item) => (
-        <div key={item._id} className={styles.card}>
-          <img src={`http://localhost:5555/uploads/${item.image}`} alt={item.title} />
-          <h4>{item.title}</h4>
-        </div>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+      {products.map(product => (
+        <ProductCard key={product._id} product={product} />
       ))}
     </div>
   );
-}
-
+};
 export default Products;

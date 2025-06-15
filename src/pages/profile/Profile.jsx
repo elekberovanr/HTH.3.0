@@ -1,82 +1,61 @@
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchProducts, deleteProduct } from '../../redux/reducers/productSlice';
 import { Link } from 'react-router';
-import API from '../../services/api';
 import styles from './Profile.module.css';
 
 function Profile() {
+    const dispatch = useDispatch();
     const user = useSelector((state) => state.user.user);
-    const [myProducts, setMyProducts] = useState([]);
+    const products = useSelector((state) => state.products.items);
+    const myProducts = products.filter(p => p.user?._id === user?._id);
 
     useEffect(() => {
-        const fetchMyProducts = async () => {
-            try {
-                const res = await API.get('/products/my/products');
-                setMyProducts(res.data);
-            } catch (err) {
-                console.error('Məhsullar alınmadı:', err);
-            }
-        };
+        dispatch(fetchProducts());
+    }, [dispatch]);
 
-        fetchMyProducts();
-    }, []);
-
-
-    if (!user) return <p>Yüklənir...</p>;
-    const handleDelete = async (id) => {
-        if (!window.confirm('Silinsin?')) return;
-        try {
-            await API.delete(`/products/${id}`);
-            setMyProducts((prev) => prev.filter((p) => p._id !== id));
-        } catch (err) {
-            alert('Silinmə zamanı xəta');
+    const handleDelete = (id) => {
+        if (window.confirm('Silmək istədiyinizə əminsiniz?')) {
+            dispatch(deleteProduct(id));
         }
     };
 
+    if (!user) return <p>Yüklənir...</p>;
 
     return (
         <div className={styles.container}>
-            <div className={styles.profileTop}>
+            <div className={styles.profileInfo}>
+                <h2>Profil</h2>
                 {user.profileImage && (
                     <img
-                        src={`http://localhost:5555/uploads/${user.profileImage}`}
-                        alt="Profil şəkli"
                         className={styles.profileImage}
+                        src={`http://localhost:5555/uploads/${user.profileImage}`}
+                        alt="Profil"
                     />
                 )}
-                <div>
-                    <h2>{user.username}</h2>
-                    <p>{user.email}</p>
-                    {user.birthday && <p>🎂 {new Date(user.birthday).toLocaleDateString()}</p>}
-                    {user.gender && <p>🧍 {user.gender}</p>}
-                    <Link to="/profile/edit" className={styles.editBtn}>Profili Dəyiş</Link>
-                </div>
+                <p><strong>Ad:</strong> {user.username}</p>
+                <p><strong>Email:</strong> {user.email}</p>
+                <p><strong>Gender:</strong> {user.gender}</p>
+                <p><strong>Birthday:</strong> {user.birthday?.slice(0, 10)}</p>
+                <p><strong>Style Preference:</strong> {user.stylePreference}</p>
+                <Link to="/profile/edit">Profili redaktə et</Link>
             </div>
 
-            <hr />
-            <h3>Mənim Məhsullarım</h3>
-            {myProducts.length === 0 ? (
-                <p>Məhsul yoxdur.</p>
-            ) : (
-                <div className={styles.productGrid}>
-                    {myProducts.map((item) => (
-                        <div key={item._id} className={styles.card}>
-                            {item.image && (
-                                <img
-                                    src={`http://localhost:5555/uploads/${item.image}`}
-                                    alt={item.title}
-                                    className={styles.productImage}
-                                />
-                            )}
-                            <p>{item.title}</p>
-                            <Link to={`/edit-product/${item._id}`}>Redaktə</Link>
-                            <button onClick={() => handleDelete(item._id)}>Sil</button>
-
-
-                        </div>
-                    ))}
+            {myProducts.map(product => (
+                <div key={product._id}>
+                    {product.image && (
+                        <img
+                            src={`http://localhost:5555/uploads/${product.image}`}
+                            alt={product.title}
+                            style={{ width: '150px', borderRadius: '8px' }}
+                        />
+                    )}
+                    <h4>{product.title}</h4>
+                    <button onClick={() => handleDelete(product._id)}>Sil</button>
+                    <Link to={`/profile/edit/${product._id}`}>Redaktə et</Link>
                 </div>
-            )}
+            ))}
+
         </div>
     );
 }

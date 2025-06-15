@@ -21,7 +21,7 @@ const handleSubmit = async (e) => {
     const res = await API.post('/auth/login', form);
     const token = res.data.token;
 
-    localStorage.setItem("accessToken", token); // Əlavə etdik
+    localStorage.setItem("accessToken", token);
     dispatch(setToken(token));
 
     const userRes = await API.get('/auth/me');
@@ -30,7 +30,7 @@ const handleSubmit = async (e) => {
     alert('Daxil oldun!');
     navigate('/');
   } catch (err) {
-    console.error(err); // Debug üçün konsola yaz
+    console.error(err); 
     alert(err?.response?.data?.error || 'Xəta baş verdi');
   }
 };

@@ -6,10 +6,14 @@ const API = axios.create({
 
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem('accessToken');
-  if (token) {
+
+  // 🛡 Məhsul siyahısı istəklərinə token göndərmə
+  if (token && !(config.method === 'get' && config.url.includes('/products'))) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
   return config;
 });
+
 
 export default API;
