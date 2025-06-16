@@ -2,18 +2,15 @@ import axios from 'axios';
 
 const API = axios.create({
   baseURL: 'http://localhost:5555/api',
+  withCredentials: true, 
 });
 
 API.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken');
-
-  // 🛡 Məhsul siyahısı istəklərinə token göndərmə
-  if (token && !(config.method === 'get' && config.url.includes('/products'))) {
+  const token = localStorage.getItem('token');
+  if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-
   return config;
 });
-
 
 export default API;

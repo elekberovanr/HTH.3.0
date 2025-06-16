@@ -1,50 +1,41 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
-import styles from './Login.module.css';
-import API from '../../services/api';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router';
+import axios from 'axios';
 import { useDispatch } from 'react-redux';
-import { setToken, setUser } from '../../redux/reducers/userSlice';
+import { setToken, fetchMe } from '../../redux/reducers/userSlice';
 
-
-function Login() {
-  const [form, setForm] = useState({ email: '', password: '' });
+const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post('http://localhost:5555/api/auth/login', { email, password });
+      const token = res.data.token;
+      await dispatch(setToken(token));
+      await dispatch(fetchMe()).unwrap();
+      navigate('/profile');
+
+    } catch (err) {
+      alert('Giriş alınmadı');
+      console.error(err);
+    }
   };
 
-  const dispatch = useDispatch();
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const res = await API.post('/auth/login', form);
-    const token = res.data.token;
-
-    localStorage.setItem("accessToken", token);
-    dispatch(setToken(token));
-
-    const userRes = await API.get('/auth/me');
-    dispatch(setUser(userRes.data));
-
-    alert('Daxil oldun!');
-    navigate('/');
-  } catch (err) {
-    console.error(err); 
-    alert(err?.response?.data?.error || 'Xəta baş verdi');
-  }
-};
-
   return (
-    <div className={styles.container}>
+    <form onSubmit={handleLogin}>
       <h2>Giriş</h2>
-      <form onSubmit={handleSubmit}>
-        <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
-        <input type="password" name="password" placeholder="Şifrə" onChange={handleChange} required />
-        <button type="submit">Daxil ol</button>
-      </form>
-    </div>
+      <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+      <input type="password" placeholder="Şifrə" value={password} onChange={(e) => setPassword(e.target.value)} required />
+      <button type="submit">Daxil ol</button>
+      <p style={{ marginTop: '10px' }}>
+        <Link to="/forgot-password">Şifrəni unutmusunuz?</Link>
+      </p>
+    </form>
   );
-}
+};
 
 export default Login;
