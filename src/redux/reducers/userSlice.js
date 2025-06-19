@@ -9,8 +9,6 @@ const initialState = {
   error: null,
 };
 
-
-
 export const fetchMe = createAsyncThunk('user/fetchMe', async (_, thunkAPI) => {
   try {
     const res = await API.get('/auth/me');

@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import styles from './Register.module.css';
+import { FiUser, FiMail, FiLock, FiCalendar, FiMapPin, FiImage } from 'react-icons/fi';
+import { BsGenderAmbiguous } from 'react-icons/bs';
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -38,21 +41,49 @@ const Register = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input type="text" name="name" placeholder="Ad" onChange={handleChange} />
-      <input type="email" name="email" placeholder="Email" onChange={handleChange} />
-      <input type="password" name="password" placeholder="Şifrə" onChange={handleChange} />
-      <input type="date" name="birthday" onChange={handleChange} />
-      <select name="gender" onChange={handleChange}>
-        <option value="">Cins</option>
-        <option value="male">Kişi</option>
-        <option value="female">Qadın</option>
-        <option value="none">None</option>
-      </select>
-      <input type="text" name="city" placeholder="Şəhər" onChange={handleChange} />
-      <input type="file" name="profileImage" onChange={handleFile} />
-      <button type="submit">Qeydiyyat</button>
-    </form>
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <h2 className={styles.title}>Register</h2>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.inputGroup}>
+            <FiUser className={styles.icon} />
+            <input type="text" name="name" placeholder="Name" onChange={handleChange} required />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <FiMail className={styles.icon} />
+            <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <FiLock className={styles.icon} />
+            <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <FiCalendar className={styles.icon} />
+            <input type="date" name="birthday" onChange={handleChange} required />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <BsGenderAmbiguous className={styles.icon}/>
+            <select name="gender" onChange={handleChange} required>
+              <option value="">Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="none">None</option>
+            </select>
+          </div>
+
+          <div className={styles.inputGroup}>
+            <FiMapPin className={styles.icon} />
+            <input type="text" name="city" placeholder="City" onChange={handleChange} required />
+          </div>
+
+          <button type="submit" className={styles.button}>Register</button>
+        </form>
+      </div>
+    </div>
   );
 };
 

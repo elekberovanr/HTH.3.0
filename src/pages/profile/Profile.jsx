@@ -1,63 +1,63 @@
-import { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchProducts, deleteProduct } from '../../redux/reducers/productSlice';
-import { Link } from 'react-router';
+import React, { useEffect, useState } from 'react';
+import axios from '../../services/api';
 import styles from './Profile.module.css';
+import { useNavigate } from 'react-router';
+import { BiUserCircle, BiEdit, BiCake, BiLocationPlus } from 'react-icons/bi';
+import MyProducts from './myProducts/MyProducts';
+import { CiLocationArrow1 } from 'react-icons/ci';
+import { BsGenderAmbiguous } from 'react-icons/bs';
 
-function Profile() {
-    const dispatch = useDispatch();
-    const user = useSelector((state) => state.user.user);
-    const products = useSelector((state) => state.products.items);
-    const myProducts = products.filter(p => p.user?._id === user?._id);
+
+const Profile = () => {
+    const [profile, setProfile] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        dispatch(fetchProducts());
-    }, [dispatch]);
+        const fetchProfile = async () => {
+            try {
+                const res = await axios.get('/auth/me');
+                setProfile(res.data);
+            } catch (err) {
+                console.error('Xəta:', err);
+            }
+        };
 
-    const handleDelete = (id) => {
-        if (window.confirm('Silmək istədiyinizə əminsiniz?')) {
-            dispatch(deleteProduct(id));
-        }
-    };
+        fetchProfile();
+    }, []);
 
-    if (!user) return <p>Yüklənir...</p>;
+    if (!profile) return <p className={styles.loading}>Yüklənir...</p>;
 
     return (
         <div className={styles.container}>
-            <div className={styles.profileInfo}>
-                <h2>Profil</h2>
-                {user.profileImage && (
-                    <img
-                        className={styles.profileImage}
-                        src={`http://localhost:5555/uploads/${user.profileImage}`}
-                        alt="Profil"
-                    />
-                )}
-                <p><strong>Ad:</strong> {user.username}</p>
-                <p><strong>Email:</strong> {user.email}</p>
-                <p><strong>Gender:</strong> {user.gender}</p>
-                <p><strong>Birthday:</strong> {user.birthday?.slice(0, 10)}</p>
-                <p><strong>Style Preference:</strong> {user.stylePreference}</p>
-                <Link to="/profile/edit">Profili redaktə et</Link>
-            </div>
-
-            {myProducts.map(product => (
-                <div key={product._id}>
-                    {product.image && (
-                        <img
-                            src={`http://localhost:5555/uploads/${product.image}`}
-                            alt={product.title}
-                            style={{ width: '150px', borderRadius: '8px' }}
-                        />
+            {/* Profil bölməsi */}
+            <div className={styles.profileTop}>
+                <div className={styles.profileImage}>
+                    {profile.profileImage ? (
+                        <img src={`http://localhost:5555/uploads/${profile.profileImage}`} alt="Profile" />
+                    ) : (
+                        <BiUserCircle className={styles.defaultIcon} />
                     )}
-                    <h4>{product.title}</h4>
-                    <button onClick={() => handleDelete(product._id)}>Sil</button>
-                    <Link to={`/profile/edit/${product._id}`}>Redaktə et</Link>
                 </div>
-            ))}
 
+                <div className={styles.profileInfo}>
+                    <h2>{profile.name}</h2>
+                    <p className={styles.email}>{profile.email}</p>
+
+                    <div className={styles.meta}>
+                        <p><strong><BiLocationPlus/></strong> {profile.city}</p>
+                        <p><strong><BsGenderAmbiguous/></strong> {profile.gender}</p>
+                        <p><strong><BiCake/></strong> {new Date(profile.birthday).toLocaleDateString()}</p>
+                    </div>
+
+                    <button className={styles.editBtn} onClick={() => navigate('/profile/edit')}>
+                        <BiEdit /> Edit Profile
+                    </button>
+                </div>
+
+            </div>
+            <MyProducts />
         </div>
     );
-}
+};
 
 export default Profile;

@@ -1,0 +1,26 @@
+.search {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background-color: #fff;
+  width: 60%;
+  position: relative;
+}
+
+.icon {
+  position: relative;
+  color: #888;
+  font-size: 16px;
+  margin-right: 8px;
+}
+
+.input {
+  padding: 8px 14px;
+  border: none;
+  outline: none;
+  border-radius: 20px;
+  font-size: 14px;
+  width: 100%;
+}

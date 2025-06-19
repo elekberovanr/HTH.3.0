@@ -1,39 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './ProductCard.module.css';
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { Link } from 'react-router';
 
 const ProductCard = ({ product }) => {
+    const [isFavorited, setIsFavorited] = useState(false);
+
+    const handleFavoriteClick = () => {
+        setIsFavorited(prev => !prev);
+    };
+
     return (
         <div className={styles.card}>
-            {/* Məhsul şəkli */}
-            {product.image && (
+            <button className={styles.favoriteBtn} onClick={handleFavoriteClick}>
+                {isFavorited ? <FaHeart /> : <FaRegHeart />}
+            </button>
+
+            {product.user && (
+                <Link to={`/user/${product.user._id}`} className={styles.userInfo}> <img
+                    src={`http://localhost:5555/uploads/${product.user.profileImage}`}
+                    alt={product.user.username}
+                    className={styles.profileImage}
+                />
+                    <span className={styles.username}>{product.user.username}</span></Link>
+            )}
+
+            <div className={styles.imageWrapper}>
                 <img
-                    className={styles.productImage}
                     src={`http://localhost:5555/uploads/${product.image}`}
                     alt={product.title}
+                    className={styles.productImage}
                 />
-            )}
-
-            {/* Məhsul başlığı və təsviri */}
-            <div className={styles.details}>
-                <h3>{product.title}</h3>
-                <p>{product.description}</p>
             </div>
 
-            {/* Göndərən istifadəçi */}
-            {product.user && (
-                <div className={styles.userInfo}>
-                    <Link to={`/user/${product.user._id}`} className={styles.link}>
-                        <img
-                            className={styles.profileImage}
-                            src={`http://localhost:5555/uploads/${product.user.profileImage}`}
-                            alt={product.user.username}
-                        />
-                        <span>{product.user.username}</span>
-                    </Link>
-                </div>
-            )}
+            <div className={styles.content}>
+                <h3 className={styles.title}>{product.title}</h3>
+                <p className={styles.description}>
+                    {product.description?.slice(0, 80)}...
+                </p>
 
+                <Link to={`/product/${product._id}`} className={styles.readMore}>
+                    Read More
+                </Link>
+            </div>
         </div>
     );
 };

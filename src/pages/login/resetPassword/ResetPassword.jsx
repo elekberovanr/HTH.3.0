@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
+import styles from './ResetPassword.module.css'; // 💡 CSS modul əlavə olunur
 
 const ResetPassword = () => {
   const [email, setEmail] = useState('');
@@ -9,7 +10,6 @@ const ResetPassword = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // Emaili localStorage-dan oxu
   useEffect(() => {
     const savedEmail = localStorage.getItem('resetEmail');
     if (savedEmail) setEmail(savedEmail);
@@ -32,27 +32,31 @@ const ResetPassword = () => {
   };
 
   return (
-    <div>
-      <h2>Şifrəni Yenilə</h2>
-      <form onSubmit={handleReset}>
-        <input type="email" value={email} disabled />
-        <input
-          type="text"
-          placeholder="Kod"
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Yeni şifrə"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          required
-        />
-        <button type="submit">Yenilə</button>
-      </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <h2>Reset Password</h2>
+        <form onSubmit={handleReset} className={styles.form}>
+          <input type="email" value={email} disabled className={styles.input} />
+          <input
+            type="text"
+            placeholder="Verification Code"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            className={styles.input}
+            required
+          />
+          <input
+            type="password"
+            placeholder="New Password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            className={styles.input}
+            required
+          />
+          <button type="submit" className={styles.button}>Reset Password</button>
+        </form>
+        {error && <p className={styles.error}>{error}</p>}
+      </div>
     </div>
   );
 };

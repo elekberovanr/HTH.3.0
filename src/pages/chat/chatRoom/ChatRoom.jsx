@@ -5,6 +5,7 @@ import API from '../../../services/api';
 import { FiTrash2 } from 'react-icons/fi';
 import styles from './ChatRoom.module.css';
 import { io } from 'socket.io-client';
+import { BiSend } from 'react-icons/bi';
 
 const socket = io('http://localhost:5555');
 
@@ -15,7 +16,6 @@ const ChatRoom = () => {
   const [newMsg, setNewMsg] = useState('');
   const chatBoxRef = useRef(null);
 
-  // Mövcud mesajları yüklə
   useEffect(() => {
     const fetchMessages = async () => {
       try {
@@ -68,17 +68,6 @@ const ChatRoom = () => {
     }
   };
 
-  // Mesaj sil
-  const handleDelete = async (msgId) => {
-    try {
-      await API.delete(`/chat/message/${msgId}`);
-      setMessages((prev) => prev.filter((msg) => msg._id !== msgId));
-      socket.emit('deleteMessage', { msgId, chatId: id });
-    } catch (err) {
-      console.error('Silinmədi:', err);
-    }
-  };
-
   const formatTime = (timestamp) => {
     const date = new Date(timestamp);
     return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
@@ -86,7 +75,6 @@ const ChatRoom = () => {
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.header}>Mesajlar</h2>
 
       <div ref={chatBoxRef} className={styles.chatBox}>
         {messages.map((msg, index) => {
@@ -96,22 +84,19 @@ const ChatRoom = () => {
               key={msg._id || `${msg.content}-${index}`}
               className={`${styles.messageRow} ${isMine ? styles.mine : styles.theirs}`}
             >
-              <div className={styles.bubbleContainer}>
-                <div className={styles.bubble}>
-                  <p>{msg.content}</p>
-                  <span className={styles.time}>{formatTime(msg.createdAt)}</span>
-                </div>
-                {isMine && (
-                  <button onClick={() => handleDelete(msg._id)} className={styles.deleteBtn}>
-                    <FiTrash2 />
-                  </button>
-                )}
-              </div>
               <img
                 src={`http://localhost:5555/uploads/${msg?.sender?.profileImage}`}
                 alt="profil"
                 className={styles.avatar}
               />
+              <div className={styles.bubbleContainer}>
+                <div className={styles.bubble}>
+                  <p>{msg.content}</p>
+                  <span className={styles.time}>{formatTime(msg.createdAt)}</span>
+                </div>
+
+              </div>
+
             </div>
           );
         })}
@@ -122,11 +107,11 @@ const ChatRoom = () => {
           type="text"
           value={newMsg}
           onChange={(e) => setNewMsg(e.target.value)}
-          placeholder="Mesaj yaz..."
+          placeholder="Type..."
           className={styles.inputField}
         />
         <button onClick={sendMessage} className={styles.sendButton}>
-          Göndər
+          <BiSend/>
         </button>
       </div>
     </div>

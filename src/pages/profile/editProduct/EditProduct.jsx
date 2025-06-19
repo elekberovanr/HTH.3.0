@@ -1,51 +1,111 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts, updateProduct } from '../../../redux/reducers/productSlice';
+import API from '../../../services/api';
+import styles from './EditProduct.module.css';
 
-function EditProduct() {
+const EditProduct = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const products = useSelector(state => state.products.items);
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('');
-  const [image, setImage] = useState(null);
+  const [product, setProduct] = useState({
+    title: '',
+    description: '',
+    category: '',
+  });
+  const [preview, setPreview] = useState('');
+  const [file, setFile] = useState(null);
 
+  // ✅ Mehsulun məlumatlarını çək
   useEffect(() => {
-    dispatch(fetchProducts());
-  }, [dispatch]);
+    const fetchProduct = async () => {
+      try {
+        const res = await API.get(`/products/${id}`);
+        const data = res.data;
+        setProduct({
+          title: data.title,
+          description: data.description,
+          category: data.category,
+        });
+        setPreview(`http://localhost:5555/uploads/${data.image}`);
+      } catch (err) {
+        console.error('Product fetch error:', err);
+      }
+    };
 
-  useEffect(() => {
-    const prod = products.find(p => p._id === id);
-    if (prod) {
-      setTitle(prod.title);
-      setDescription(prod.description || '');
-      setCategory(prod.category || '');
-    }
-  }, [products, id]);
+    fetchProduct();
+  }, [id]);
+
+  const handleChange = (e) => {
+    setProduct({ ...product, [e.target.name]: e.target.value });
+  };
+
+  const handleFileChange = (e) => {
+    const selected = e.target.files[0];
+    setFile(selected);
+    setPreview(URL.createObjectURL(selected));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('description', description);
-    formData.append('category', category);
-    if (image) formData.append('image', image);
-    await dispatch(updateProduct({ id, data: formData }));
-    navigate('/profile');
+    try {
+      const formData = new FormData();
+      formData.append('title', product.title);
+      formData.append('description', product.description);
+      formData.append('category', product.category);
+      if (file) {
+        formData.append('image', file);
+      }
+
+      await API.put(`/products/${id}`, formData);
+      navigate('/profile'); // və ya istədiyin səhifəyə yönləndir
+    } catch (err) {
+      console.error('Update error:', err);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
-      <textarea value={description} onChange={(e) => setDescription(e.target.value)} required />
-      <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} required />
-      <input type="file" onChange={(e) => setImage(e.target.files[0])} />
-      <button type="submit">Yenilə</button>
-    </form>
+    <div className={styles.container}>
+      <h2>Edit Product</h2>
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <input
+          type="text"
+          name="title"
+          value={product.title}
+          onChange={handleChange}
+          className={styles.input}
+          placeholder="Title"
+          required
+        />
+        <textarea
+          name="description"
+          value={product.description}
+          onChange={handleChange}
+          className={styles.textarea}
+          rows="4"
+          placeholder="Description"
+          required
+        />
+        <input
+          type="text"
+          name="category"
+          value={product.category}
+          onChange={handleChange}
+          className={styles.input}
+          placeholder="Category"
+        />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className={styles.fileInput}
+        />
+
+        {preview && <img src={preview} alt="Preview" className={styles.preview} />}
+
+        <button type="submit" className={styles.button}>Save Changes</button>
+      </form>
+    </div>
   );
-}
+};
+
 export default EditProduct;

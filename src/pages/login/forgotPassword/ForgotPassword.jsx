@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import styles from './ForgotPassword.module.css';
 import { useNavigate } from 'react-router';
 
 const ForgotPassword = () => {
@@ -11,7 +12,6 @@ const ForgotPassword = () => {
     e.preventDefault();
     try {
       await axios.post('http://localhost:5555/api/auth/forgot-password', { email });
-      // Email-i yönləndirmə zamanı ötürmək üçün localStorage-da saxlayırıq (və ya context, state ilə ötürə bilərik)
       localStorage.setItem('resetEmail', email);
       navigate('/reset-password');
     } catch (err) {
@@ -20,19 +20,22 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div>
-      <h2>Şifrəni Unutmusan?</h2>
-      <form onSubmit={handleSendCode}>
-        <input
-          type="email"
-          placeholder="Emaili daxil edin"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <button type="submit">Kod Göndər</button>
-      </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <div className={styles.wrapper}>
+      <div className={styles.card}>
+        <h2 className={styles.title}>Şifrəni Unutmusan?</h2>
+        <form onSubmit={handleSendCode} className={styles.form}>
+          <input
+            type="email"
+            placeholder="Emaili daxil edin"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className={styles.input}
+          />
+          <button type="submit" className={styles.button}>Kod Göndər</button>
+          {error && <p className={styles.error}>{error}</p>}
+        </form>
+      </div>
     </div>
   );
 };
