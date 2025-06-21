@@ -17,14 +17,20 @@ const Login = () => {
     try {
       const res = await axios.post('http://localhost:5555/api/auth/login', { email, password });
       const token = res.data.token;
+      const user = res.data.user;
       await dispatch(setToken(token));
       await dispatch(fetchMe()).unwrap();
-      navigate('/profile');
+
+      if (user.isAdmin) {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/profile');
+      }
     } catch (err) {
       alert('Giriş alınmadı');
-      console.error(err);
     }
   };
+
 
   return (
     <div className={styles.container}>

@@ -1,0 +1,38 @@
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 220px;
+    background-color: #1f2d3d;
+    color: white;
+    padding: 20px;
+
+    nav {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.sidebar h2 {
+    margin-bottom: 30px;
+    font-size: 22px;
+}
+
+.sidebar a {
+    color: white;
+    margin-bottom: 12px;
+    text-decoration: none;
+}
+
+.sidebar a:hover {
+    color: #00d1b2;
+}
+
+.content {
+    flex: 1;
+    padding: 30px;
+    background-color: #f4f4f4;
+    overflow-y: auto;
+}

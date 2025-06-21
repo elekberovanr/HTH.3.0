@@ -3,11 +3,12 @@ import axios from 'axios';
 import API from '../../services/api';
 
 const initialState = {
+  user: JSON.parse(localStorage.getItem('user')) || null,
   token: localStorage.getItem('token') || null,
-  user: null,
   loading: false,
   error: null,
 };
+
 
 export const fetchMe = createAsyncThunk('user/fetchMe', async (_, thunkAPI) => {
   try {
