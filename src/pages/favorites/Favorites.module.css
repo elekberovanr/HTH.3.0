@@ -1,0 +1,105 @@
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+  justify-content: center;
+}
+
+.card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.imageSection {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.info {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #ccc;
+}
+
+.category {
+  font-size: 14px;
+  color: #666;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  gap: 8px;
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.iconBtn:hover {
+  transform: scale(1.1);
+}
+
+.readMore {
+  text-decoration: none;
+  color: #6b46c1;
+  font-weight: 500;
+  margin-left: auto;
+}
+
+.empty {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: gray;
+}
+
+/* Mobil uyğun */
+@media (max-width: 480px) {
+  .card {
+    max-width: 100%;
+  }
+
+  .imageSection {
+    height: 180px;
+  }
+
+  .readMore {
+    font-size: 14px;
+  }
+}

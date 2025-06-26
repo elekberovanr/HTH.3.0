@@ -1,33 +1,42 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, Navigate, Outlet } from 'react-router';
 import styles from './AdminLayout.module.css';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchMe } from '../../../redux/reducers/userSlice';
 
 const AdminLayout = () => {
+  const dispatch = useDispatch();
+  const { user, loading } = useSelector((state) => state.user);
 
-    const { user, loading } = useSelector((state) => state.user);
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (token && !user) {
+      dispatch(fetchMe());
+    }
+  }, [dispatch, user]);
 
-    if (loading) return <p>Yüklənir...</p>;
-    if (!user || !user.isAdmin) return <Navigate to="/login" />;
-    return (
-        <div className={styles.container}>
-            <aside className={styles.sidebar}>
-                <h2>Admin</h2>
-                <nav>
-                    <Link to="/admin/dashboard">Dashboard</Link>
-                    <Link to="/admin/users">Users</Link>
-                    <Link to="/admin/products">Products</Link>
-                    <Link to="/admin/categories">Categories</Link>
-                    <Link to="/admin/payments">Payments</Link>
-                    <Link to="/admin/notifications">Notifications</Link>
-                    <Link to="/login">Logout</Link>
-                </nav>
-            </aside>
-            <main className={styles.content}>
-                <Outlet />
-            </main>
-        </div>
-    );
+  if (loading || !user) return <p>Yüklənir...</p>;
+  if (!user.isAdmin) return <Navigate to="/login" />;
+
+  return (
+    <div className={styles.container}>
+      <aside className={styles.sidebar}>
+        <h2>Admin</h2>
+        <nav>
+          <Link to="/admin/dashboard">Dashboard</Link>
+          <Link to="/admin/users">Users</Link>
+          <Link to="/admin/products">Products</Link>
+          <Link to="/admin/categories">Categories</Link>
+          <Link to="/admin/payments">Payments</Link>
+          <Link to="/admin/notifications">Notifications</Link>
+          <Link to="/login">Logout</Link>
+        </nav>
+      </aside>
+      <main className={styles.content}>
+        <Outlet />
+      </main>
+    </div>
+  );
 };
 
 export default AdminLayout;

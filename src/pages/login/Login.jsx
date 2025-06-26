@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
-import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
+import API from '../../services/api';
 import { useDispatch } from 'react-redux';
 import { setToken, fetchMe } from '../../redux/reducers/userSlice';
 import { FiMail, FiLock } from 'react-icons/fi';
@@ -15,10 +15,11 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5555/api/auth/login', { email, password });
+      const res = await API.post('/auth/login', { email, password });
       const token = res.data.token;
       const user = res.data.user;
-      await dispatch(setToken(token));
+
+      dispatch(setToken(token));
       await dispatch(fetchMe()).unwrap();
 
       if (user.isAdmin) {
@@ -30,7 +31,6 @@ const Login = () => {
       alert('Giriş alınmadı');
     }
   };
-
 
   return (
     <div className={styles.container}>

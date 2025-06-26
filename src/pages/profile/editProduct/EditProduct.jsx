@@ -2,107 +2,131 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import API from '../../../services/api';
 import styles from './EditProduct.module.css';
+import { FiUpload, FiSave } from 'react-icons/fi';
 
 const EditProduct = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
-  const [product, setProduct] = useState({
+  const [form, setForm] = useState({
     title: '',
     description: '',
     category: '',
   });
-  const [preview, setPreview] = useState('');
-  const [file, setFile] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [images, setImages] = useState([]);
+  const [existingImages, setExistingImages] = useState([]);
 
-  // ✅ Mehsulun məlumatlarını çək
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchData = async () => {
       try {
-        const res = await API.get(`/products/${id}`);
-        const data = res.data;
-        setProduct({
-          title: data.title,
-          description: data.description,
-          category: data.category,
+        const productRes = await API.get(`/products/${id}`);
+        setForm({
+          title: productRes.data.title,
+          description: productRes.data.description,
+          category: productRes.data.category?._id || productRes.data.category,
         });
-        setPreview(`http://localhost:5555/uploads/${data.image}`);
+        setExistingImages(productRes.data.images || []);
       } catch (err) {
-        console.error('Product fetch error:', err);
+        console.error('Məhsul yüklənmədi:', err);
+      }
+
+      try {
+        const catRes = await API.get('/categories');
+        setCategories(catRes.data);
+      } catch (err) {
+        console.error('Kateqoriyalar alınmadı:', err);
       }
     };
-
-    fetchProduct();
+    fetchData();
   }, [id]);
 
   const handleChange = (e) => {
-    setProduct({ ...product, [e.target.name]: e.target.value });
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleFileChange = (e) => {
-    const selected = e.target.files[0];
-    setFile(selected);
-    setPreview(URL.createObjectURL(selected));
+    setImages(Array.from(e.target.files));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const formData = new FormData();
-      formData.append('title', product.title);
-      formData.append('description', product.description);
-      formData.append('category', product.category);
-      if (file) {
-        formData.append('image', file);
-      }
+    const formData = new FormData();
+    formData.append('title', form.title);
+    formData.append('description', form.description);
+    formData.append('category', form.category);
+    images.forEach((file) => formData.append('images', file));
 
+    try {
       await API.put(`/products/${id}`, formData);
-      navigate('/profile'); // və ya istədiyin səhifəyə yönləndir
+      navigate('/profile');
     } catch (err) {
-      console.error('Update error:', err);
+      console.error('Redaktə zamanı xəta:', err);
     }
   };
 
   return (
     <div className={styles.container}>
-      <h2>Edit Product</h2>
-      <form onSubmit={handleSubmit} className={styles.form}>
+      <h2 className={styles.title}>🖊️ Məhsulu Redaktə Et</h2>
+      <form className={styles.form} onSubmit={handleSubmit}>
+        <label>Başlıq</label>
         <input
           type="text"
           name="title"
-          value={product.title}
+          value={form.title}
           onChange={handleChange}
-          className={styles.input}
-          placeholder="Title"
           required
         />
+
+        <label>Açıqlama</label>
         <textarea
           name="description"
-          value={product.description}
+          value={form.description}
           onChange={handleChange}
-          className={styles.textarea}
-          rows="4"
-          placeholder="Description"
           required
         />
-        <input
-          type="text"
+
+        <label>Kateqoriya</label>
+        <select
           name="category"
-          value={product.category}
+          value={form.category}
           onChange={handleChange}
-          className={styles.input}
-          placeholder="Category"
-        />
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          className={styles.fileInput}
-        />
+          required
+          className={styles.select}
+        >
+          <option value="">Seçin</option>
+          {categories.map((cat) => (
+            <option key={cat._id} value={cat._id}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
 
-        {preview && <img src={preview} alt="Preview" className={styles.preview} />}
+        <label>Yeni şəkillər</label>
+        <div className={styles.uploadWrapper}>
+          <input
+            type="file"
+            multiple
+            onChange={handleFileChange}
+            className={styles.fileInput}
+          />
+          <FiUpload className={styles.uploadIcon} />
+        </div>
 
-        <button type="submit" className={styles.button}>Save Changes</button>
+        <div className={styles.imagePreview}>
+          {existingImages.map((img, idx) => (
+            <div key={idx} className={styles.card}>
+              <img
+                src={`http://localhost:5555/uploads/${img}`}
+                alt="mevcut"
+                className={styles.previewImg}
+              />
+            </div>
+          ))}
+        </div>
+
+        <button type="submit" className={styles.saveBtn}>
+          <FiSave /> Yadda saxla
+        </button>
       </form>
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from '../../../services/api';
+import API from '../../../services/api';
 import styles from './EditProfile.module.css';
 import { useNavigate } from 'react-router';
 
@@ -11,14 +11,13 @@ const EditProfile = () => {
     birthday: '',
     profileImage: null,
   });
-   const navigate = useNavigate();
-
   const [preview, setPreview] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get('/auth/me');
+        const res = await API.get('/auth/me');
         const user = res.data;
 
         setFormData({
@@ -57,35 +56,42 @@ const EditProfile = () => {
         if (value) data.append(key, value);
       });
 
-      await axios.put('/auth/update', data, {
+      await API.put('/auth/me', data, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      alert('Profile updated successfully!');
+
+      navigate('/profile');
     } catch (err) {
       console.error('Profile update error:', err);
-      alert('Update failed');
+      alert('Profil yenilənmədi');
     }
   };
 
   return (
     <div className={styles.container}>
-      <h2>Edit Profile</h2>
+      <h2 className={styles.title}>Profil Redaktəsi</h2>
       <form onSubmit={handleSubmit} className={styles.form}>
         {preview && (
           <div className={styles.preview}>
-            <img src={preview} alt="Preview" />
+            <img src={preview} alt="Profil şəkli" />
           </div>
         )}
 
-        <input type="file" name="profileImage" accept="image/*" onChange={handleChange} />
+        <input
+          type="file"
+          name="profileImage"
+          accept="image/*"
+          onChange={handleChange}
+        />
 
         <input
           type="text"
           name="name"
           value={formData.name}
           onChange={handleChange}
-          placeholder="Name"
+          placeholder="Adınız"
+          required
         />
 
         <input
@@ -93,14 +99,19 @@ const EditProfile = () => {
           name="city"
           value={formData.city}
           onChange={handleChange}
-          placeholder="City"
+          placeholder="Şəhər"
         />
 
-        <select name="gender" value={formData.gender} onChange={handleChange}>
-          <option value="">Select gender</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-          <option value="other">Other</option>
+        <select
+          name="gender"
+          value={formData.gender}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Cins seçin</option>
+          <option value="male">Kişi</option>
+          <option value="female">Qadın</option>
+          <option value="other">Digər</option>
         </select>
 
         <input
@@ -110,7 +121,7 @@ const EditProfile = () => {
           onChange={handleChange}
         />
 
-        <button type="submit" onClick={() => navigate('/profile')}>Save</button>
+        <button type="submit" className={styles.button}>Yadda saxla</button>
       </form>
     </div>
   );

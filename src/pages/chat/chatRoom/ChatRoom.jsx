@@ -1,17 +1,18 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import API from '../../../services/api';
-import { FiTrash2 } from 'react-icons/fi';
-import styles from './ChatRoom.module.css';
+import { clearUnread } from '../../../redux/reducers/chatSlice';
 import { io } from 'socket.io-client';
+import styles from './ChatRoom.module.css';
 import { BiSend } from 'react-icons/bi';
 
 const socket = io('http://localhost:5555');
 
 const ChatRoom = () => {
-  const { id } = useParams(); // chatId
+  const { id } = useParams();
   const user = useSelector((state) => state.user.user);
+  const dispatch = useDispatch();
   const [messages, setMessages] = useState([]);
   const [newMsg, setNewMsg] = useState('');
   const chatBoxRef = useRef(null);
@@ -26,14 +27,9 @@ const ChatRoom = () => {
       }
     };
     fetchMessages();
-  }, [id]);
+    dispatch(clearUnread());
+  }, [id, dispatch]);
 
-  // Scroll sona getsin
-  useEffect(() => {
-    chatBoxRef.current?.scrollTo(0, chatBoxRef.current.scrollHeight);
-  }, [messages]);
-
-  // Socket bağlantısı
   useEffect(() => {
     socket.emit('joinRoom', id);
 
@@ -41,27 +37,24 @@ const ChatRoom = () => {
       setMessages((prev) => [...prev, incomingMsg]);
     });
 
-    socket.on('messageDeleted', (deletedId) => {
-      setMessages((prev) => prev.filter((msg) => msg._id !== deletedId));
-    });
-
     return () => {
       socket.off('newMessage');
-      socket.off('messageDeleted');
     };
   }, [id]);
 
-  // Mesaj göndər
+  useEffect(() => {
+    chatBoxRef.current?.scrollTo(0, chatBoxRef.current.scrollHeight);
+  }, [messages]);
+
   const sendMessage = async () => {
     if (!newMsg.trim()) return;
-
     try {
       const res = await API.post('/chat/message', {
         chatId: id,
-        content: newMsg
+        content: newMsg,
       });
-
-      socket.emit('sendMessage', res.data); // Göndərilən mesajı socket ilə ötür
+      socket.emit('sendMessage', res.data);
+      setMessages((prev) => [...prev, res.data]);
       setNewMsg('');
     } catch (err) {
       console.error('Göndərilə bilmədi:', err);
@@ -75,13 +68,12 @@ const ChatRoom = () => {
 
   return (
     <div className={styles.container}>
-
       <div ref={chatBoxRef} className={styles.chatBox}>
-        {messages.map((msg, index) => {
+        {messages.map((msg) => {
           const isMine = msg?.sender?._id === user?._id;
           return (
             <div
-              key={msg._id || `${msg.content}-${index}`}
+              key={msg._id}
               className={`${styles.messageRow} ${isMine ? styles.mine : styles.theirs}`}
             >
               <img
@@ -94,9 +86,7 @@ const ChatRoom = () => {
                   <p>{msg.content}</p>
                   <span className={styles.time}>{formatTime(msg.createdAt)}</span>
                 </div>
-
               </div>
-
             </div>
           );
         })}
@@ -111,7 +101,7 @@ const ChatRoom = () => {
           className={styles.inputField}
         />
         <button onClick={sendMessage} className={styles.sendButton}>
-          <BiSend/>
+          <BiSend />
         </button>
       </div>
     </div>

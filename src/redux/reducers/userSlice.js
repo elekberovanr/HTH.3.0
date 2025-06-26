@@ -1,14 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
 import API from '../../services/api';
 
 const initialState = {
   user: JSON.parse(localStorage.getItem('user')) || null,
-  token: localStorage.getItem('token') || null,
+  token: localStorage.getItem('accessToken') || null,
   loading: false,
   error: null,
 };
-
 
 export const fetchMe = createAsyncThunk('user/fetchMe', async (_, thunkAPI) => {
   try {
@@ -19,7 +17,6 @@ export const fetchMe = createAsyncThunk('user/fetchMe', async (_, thunkAPI) => {
   }
 });
 
-
 const userSlice = createSlice({
   name: 'user',
   initialState,
@@ -27,11 +24,12 @@ const userSlice = createSlice({
     logout: (state) => {
       state.token = null;
       state.user = null;
-      localStorage.removeItem('token');
+      localStorage.removeItem('accessToken'); 
+      localStorage.removeItem('user');
     },
     setToken: (state, action) => {
       state.token = action.payload;
-      localStorage.setItem('token', action.payload);
+      localStorage.setItem('accessToken', action.payload); 
     },
   },
   extraReducers: (builder) => {
@@ -42,6 +40,7 @@ const userSlice = createSlice({
       .addCase(fetchMe.fulfilled, (state, action) => {
         state.user = action.payload;
         state.loading = false;
+        localStorage.setItem('user', JSON.stringify(action.payload)); 
       })
       .addCase(fetchMe.rejected, (state, action) => {
         state.error = action.payload;

@@ -12,7 +12,6 @@
   align-items: center;
   justify-content: space-between;
   max-width: 1200px;
-  margin: 0 auto;
   position: relative;
 }
 
@@ -29,12 +28,12 @@
 }
 
 .title {
-  font-size: 20px;
+  font-size: 23px;
   font-weight: bold;
 }
 
 .menuToggle {
-  font-size: 24px;
+  font-size: 25px;
   color: white;
   background: none;
   border: none;
@@ -84,7 +83,29 @@
   color: red;
 }
 
-/* Mobile görünüş */
+.bellWrapper {
+  position: relative;
+  margin-right: 20px;
+}
+
+.bellIcon {
+  font-size: 24px;
+  color: #444;
+}
+
+.badge {
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 50%;
+  font-weight: bold;
+}
+
+
 @media (max-width: 768px) {
   .menuToggle {
     display: block;

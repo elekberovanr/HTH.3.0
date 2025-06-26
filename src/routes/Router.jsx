@@ -14,6 +14,13 @@ import ResetPassword from '../pages/login/resetPassword/ResetPassword';
 import EditProfile from '../pages/profile/profileEdit/EditProfile';
 import AdminLayout from '../pages/admin/adminLayout/AdminLayout';
 import Dashboard from '../pages/admin/dashboard/Dashboard';
+import RequireAuth from '../components/auth/RequireAuth';
+import AddCategory from '../pages/admin/category/AddCategory';
+import UsersList from '../pages/admin/users/UsersList';
+import AdminProducts from '../pages/admin/products/AdminProducts';
+import Favorites from '../pages/favorites/Favorites';
+import ProductDetail from '../pages/detailPage/ProductDetail';
+
 
 
 const Router = () => {
@@ -32,11 +39,47 @@ const Router = () => {
         <Route path="chat/:id?" element={<ChatLayout />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/favorites" element={<Favorites />} />
+        <Route path="product/:id" element={<ProductDetail/>} />
+
+
+      </Route>
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route
+          path="dashboard"
+          element={
+            <RequireAuth adminOnly={true}>
+              <Dashboard />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="categories"
+          element={
+            <RequireAuth adminOnly={true}>
+              <AddCategory />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="users"
+          element={
+            <RequireAuth adminOnly={true}>
+              <UsersList />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="products"
+          element={
+            <RequireAuth adminOnly={true}>
+              <AdminProducts />
+            </RequireAuth>
+          }
+        />
       </Route>
 
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route path="dashboard" element={<Dashboard />} />
-      </Route>
+
 
     </Routes>
 

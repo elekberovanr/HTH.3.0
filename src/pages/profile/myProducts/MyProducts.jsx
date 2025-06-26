@@ -31,41 +31,40 @@ const MyProducts = () => {
         }
     };
 
-    const handleEdit = (id) => {
-        navigate(`/product/edit/${id}`);
-    };
 
     return (
         <div className={styles.container}>
-            <h3 className={styles.title}>Mənim Məhsullarım</h3>
             <div className={styles.grid}>
-                {products.map((product) => (
-                    <div key={product._id} className={styles.card}>
-                        <img
-                            src={`http://localhost:5555/uploads/${product.image}`}
-                            alt={product.title}
-                            className={styles.image}
-                        />
-                        <div className={styles.content}>
-                            <h4>{product.title}</h4>
-                            <p>{product.description?.slice(0, 50)}...</p>
-
-                            <div className={styles.icons}>
-                                <Link to={`/profile/edit/${product._id}`}>
-                                    <FiEdit
-                                        className={styles.editIcon}
-                                        onClick={() => handleEdit(product._id)}
-                                        title="Redaktə et"
-                                    /></Link>
-                                <FiTrash2
-                                    className={styles.deleteIcon}
-                                    onClick={() => handleDelete(product._id)}
-                                    title="Sil"
-                                />
+                {products.length === 0 ? (
+                    <p className={styles.empty}>Sizin məhsulunuz yoxdur.</p>
+                ) : (
+                    products.map((product) => (
+                        <div key={product._id} className={styles.card}>
+                            <img
+                                src={`http://localhost:5555/uploads/${product.images?.[0] || product.image}`}
+                                alt={product.title}
+                                className={styles.image}
+                            />
+                            <div className={styles.content}>
+                                <h4>{product.title}</h4>
+                                <p>{product.description?.slice(0, 50)}...</p>
+                                <div className={styles.icons}>
+                                    <Link to={`/profile/edit/${product._id}`}>
+                                        <FiEdit
+                                            className={styles.editIcon}
+                                            onClick={() => handleEdit(product._id)}
+                                            title="Redaktə et"
+                                        /> Edit</Link>
+                                    <FiTrash2
+                                        className={styles.deleteIcon}
+                                        onClick={() => handleDelete(product._id)}
+                                        title="Sil"
+                                    />
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))
+                )}
             </div>
         </div>
     );

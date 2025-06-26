@@ -1,77 +1,106 @@
-import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router';
+import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { createProduct } from '../../redux/reducers/productSlice';
-import { fetchCategories } from '../../redux/reducers/categorySlice';
 import styles from './AddProduct.module.css';
+import { FaUpload, FaPlus, FaBox } from 'react-icons/fa';
+import { useNavigate } from 'react-router';
+import API from '../../services/api';
 
-function AddProduct() {
+const AddProduct = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
-  const [image, setImage] = useState(null);
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const { list: categories, loading } = useSelector((state) => state.categories);
+  const [categories, setCategories] = useState([]);
+  const [images, setImages] = useState([]);
 
   useEffect(() => {
-    dispatch(fetchCategories());
-  }, [dispatch]);
+    const fetchCategories = async () => {
+      try {
+        const res = await API.get('/categories');
+        setCategories(res.data);
+      } catch (err) {
+        console.error('Failed to load categories:', err);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const formData = new FormData();
     formData.append('title', title);
     formData.append('description', description);
     formData.append('category', category);
-    if (image) formData.append('image', image);
-    await dispatch(createProduct(formData));
-    navigate('/profile');
+    images.forEach((img) => formData.append('image', img));
+
+    try {
+      await dispatch(createProduct(formData));
+      navigate('/profile'); 
+    } catch (err) {
+      console.error('Add product error:', err);
+    }
   };
 
   return (
     <div className={styles.container}>
-      <form onSubmit={handleSubmit}>
+      <h2><FaPlus /> Add New Product</h2>
+      <form onSubmit={handleSubmit} className={styles.form}>
         <input
           type="text"
-          placeholder="Başlıq"
+          placeholder="Product Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
         />
-
         <textarea
-          placeholder="Təsvir"
+          placeholder="Product Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
         />
-
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           required
         >
-          <option value="">Kateqoriya seç</option>
-          {loading ? (
-            <option disabled>Yüklənir...</option>
-          ) : (
-            categories.map((cat) => (
-              <option key={cat._id} value={cat._id}>
-                {cat.name}
-              </option>
-            ))
-          )}
+          <option value="">Select category</option>
+          {categories.map((cat) => (
+            <option key={cat._id} value={cat._id}>
+              {cat.name}
+            </option>
+          ))}
         </select>
 
-        <input type="file" onChange={(e) => setImage(e.target.files[0])} />
+        <label className={styles.uploadLabel}>
+          <FaUpload /> Upload Images (max 10)
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={(e) => setImages([...e.target.files])}
+          />
+        </label>
 
-        <button type="submit">Əlavə et</button>
+        <div className={styles.preview}>
+          {images.length > 0 && Array.from(images).map((img, idx) => (
+            <img
+              key={idx}
+              src={URL.createObjectURL(img)}
+              alt={`preview-${idx}`}
+              className={styles.thumbnail}
+            />
+          ))}
+        </div>
+
+        <button type="submit" className={styles.button}>
+          Share Product
+        </button>
       </form>
     </div>
   );
-}
+};
 
 export default AddProduct;
