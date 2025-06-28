@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getFavorites, removeFavorite } from '../../services/api';
+import { getFavorites, removeFavorite } from '../../services/API';
 import styles from './Favorites.module.css';
 import ProductCard from '../../components/product/ProductCard';
 
@@ -35,11 +35,15 @@ const Favorites = () => {
         <p>Heç bir məhsulu sevimli etməmisiniz.</p>
       ) : (
         <div className={styles.grid}>
-          {favorites.map(fav => (
-            <div key={fav._id} className={styles.cardWrapper}>
-              <ProductCard product={fav.product} />
-            </div>
+          {favorites.map((fav, idx) => (
+            fav.product ? (
+              <div key={fav.product._id || idx} className={styles.cardWrapper}>
+                <ProductCard product={fav.product} />
+              </div>
+            ) : null
           ))}
+
+
         </div>
       )}
     </div>

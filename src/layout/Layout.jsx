@@ -8,6 +8,7 @@ import { fetchMe } from '../redux/reducers/userSlice';
 function Layout() {
   const dispatch = useDispatch();
   const token = useSelector((state) => state.user.token);
+  const user = useSelector((state) => state.user.user);
 
   useEffect(() => {
     if (token) {
@@ -17,11 +18,11 @@ function Layout() {
 
   return (
     <div>
-      <Header />
+      {!user?.isAdmin && <Header />}
       <main style={{ minHeight: '80vh', padding: '1rem' }}>
         <Outlet />
       </main>
-      <Footer />
+      {!user?.isAdmin && <Footer />}
     </div>
   );
 }

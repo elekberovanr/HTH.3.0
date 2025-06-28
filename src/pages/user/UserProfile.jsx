@@ -1,13 +1,18 @@
-import { useParams, useNavigate } from 'react-router';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import API from '../../services/api';
 import ProductCard from '../../components/product/ProductCard';
 import styles from './UserProfile.module.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchChats, setSelectedChat } from '../../redux/reducers/chatSlice';
 
 const UserProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const dispatch = useDispatch();
+  const { chatList } = useSelector(state => state.chat);
+  const user = useSelector(state => state.user.user);
+  const [profileUser, setProfileUser] = useState(null);
   const [userProducts, setUserProducts] = useState([]);
   const [error, setError] = useState('');
 
@@ -15,7 +20,7 @@ const UserProfile = () => {
     const fetchUser = async () => {
       try {
         const res = await API.get(`/users/${id}`);
-        setUser(res.data);
+        setProfileUser(res.data);
       } catch (err) {
         setError('İstifadəçi tapılmadı və ya bağlantı xətası.');
       }
@@ -34,31 +39,39 @@ const UserProfile = () => {
     fetchUserProducts();
   }, [id]);
 
-  const handleStartChat = async () => {
-    try {
-      const res = await API.post('/chat', { receiverId: id });
-      navigate(`/chat/${res.data._id}`);
-    } catch (err) {
-      alert('Chat başlatmaq mümkün olmadı');
-    }
-  };
+ const handleStartChat = async () => {
+  try {
+    const res = await API.post('/chat', { receiverId: id }); // chat yaradıldı
+    const chatId = res.data._id;
+    
+    const chatDetail = await API.get(`/chat/chat-info/${chatId}`); // tam chat məlumatı al
+    dispatch(fetchChats(user._id));
+    dispatch(setSelectedChat(chatDetail.data)); // tam məlumatla Redux-a set et
+
+    navigate(`/chat/${chatId}`);
+  } catch (err) {
+    alert('Chat başlatmaq mümkün olmadı');
+    console.error(err);
+  }
+};
+
 
   if (error) return <p className={styles.error}>{error}</p>;
-  if (!user) return <p className={styles.loading}>Yüklənir...</p>;
+  if (!profileUser) return <p className={styles.loading}>Yüklənir...</p>;
 
   return (
     <div className={styles.container}>
       <div className={styles.profileSection}>
         <img
-          src={`http://localhost:5555/uploads/${user.profileImage}`}
+          src={`http://localhost:5555/uploads/${profileUser.profileImage}`}
           alt="Profil"
           className={styles.avatar}
         />
         <div className={styles.details}>
-          <h2>{user.username}</h2>
-          <p><strong>Şəhər:</strong> {user.city}</p>
-          <p><strong>Cins:</strong> {user.gender}</p>
-          <p><strong>Doğum tarixi:</strong> {new Date(user.birthday).toLocaleDateString()}</p>
+          <h2>{profileUser.username}</h2>
+          <p><strong>Şəhər:</strong> {profileUser.city}</p>
+          <p><strong>Cins:</strong> {profileUser.gender}</p>
+          <p><strong>Doğum tarixi:</strong> {new Date(profileUser.birthday).toLocaleDateString()}</p>
           <button className={styles.chatButton} onClick={handleStartChat}>
             Mesaj göndər
           </button>

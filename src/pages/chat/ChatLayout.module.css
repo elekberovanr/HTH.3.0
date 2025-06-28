@@ -1,27 +1,34 @@
 .container {
   display: flex;
-  height: 100vh;
-  width: 100%;
+  height: 90vh;
+  background-color: #f4f4f4;
 }
 
-.chatList {
+.left {
   width: 30%;
-  min-width: 240px;
   border-right: 1px solid #ccc;
   overflow-y: auto;
-  background: #f3f3f3;
+  background: #fff;
 }
 
-.chatRoom {
-  flex: 1;
-  background: #fff;
+.right {
+  width: 70%;
   display: flex;
   flex-direction: column;
 }
 
-.welcome {
-  margin: auto;
-  text-align: center;
-  font-size: 18px;
-  color: #888;
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .left,
+  .right {
+    width: 100%;
+    height: 100%;
+  }
+
+  .hideOnMobile {
+    display: none;
+  }
 }

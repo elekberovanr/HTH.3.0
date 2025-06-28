@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import styles from './ProductDetail.module.css';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import API, { addFavorite, removeFavorite, getFavorites } from '../../services/api';
-
+import { fetchChats, setSelectedChat } from '../../redux/reducers/chatSlice';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -12,6 +12,8 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState('');
   const [isFavorited, setIsFavorited] = useState(false);
   const user = useSelector(state => state.user.user);
+  const navigate = useNavigate();
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -55,6 +57,30 @@ const ProductDetail = () => {
     }
   };
 
+  const handleStartChat = async () => {
+    if (!user || user._id === product.user._id) return;
+    try {
+      // 1. Yeni və ya mövcud chat yaradılır
+      const res = await API.post('/chat', { receiverId: product.user._id });
+      const chatId = res.data._id;
+
+      // 2. Tam chat məlumatı alınır (participant-larla birgə)
+      const chatDetail = await API.get(`/chat/chat-info/${chatId}`);
+
+      // 3. Redux-a tam chat set olunur və siyahı yenilənir
+      dispatch(fetchChats(user._id));
+      dispatch(setSelectedChat(chatDetail.data));
+
+      // 4. Navigasiya chat səhifəsinə
+      navigate(`/chat/${chatId}`);
+    } catch (err) {
+      console.error('Chat başlatmaq mümkün olmadı:', err.message);
+    }
+  };
+
+
+
+
   if (!product) return <p>Yüklənir...</p>;
 
   return (
@@ -91,7 +117,8 @@ const ProductDetail = () => {
               <div className={styles.profileImage}>❓</div>
             )}
             <span>{product.user?.name}</span>
-          </div></Link>
+          </div>
+        </Link>
 
         <h2 className={styles.title}>{product.title}</h2>
         <p className={styles.category}>Kateqoriya: {product.category?.name}</p>
@@ -101,9 +128,9 @@ const ProductDetail = () => {
           <button className={styles.favBtn} onClick={handleFavorite}>
             {isFavorited ? <FaHeart color="red" /> : <FaRegHeart />}
           </button>
-          <Link to={`/chat/${product.user?._id}`} className={styles.chatBtn}>
-            Söhbət et 💬
-          </Link>
+          <button className={styles.chatBtn} onClick={handleStartChat}>
+            Söhbət et
+          </button>
         </div>
       </div>
     </div>

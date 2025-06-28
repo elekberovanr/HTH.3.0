@@ -25,6 +25,7 @@ const AdminLayout = () => {
         <nav>
           <Link to="/admin/dashboard">Dashboard</Link>
           <Link to="/admin/users">Users</Link>
+          <Link to='/admin/support'>Support</Link>
           <Link to="/admin/products">Products</Link>
           <Link to="/admin/categories">Categories</Link>
           <Link to="/admin/payments">Payments</Link>

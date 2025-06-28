@@ -1,0 +1,26 @@
+.pageWrapper {
+  display: flex;
+  height: 100vh;
+  font-family: 'Poppins', sans-serif;
+}
+
+.sidebar {
+  width: 300px;
+  background-color: #1e293b;
+  color: white;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.chatPanel {
+  flex: 1;
+  background-color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+}
+
+.placeholder {
+  margin: auto;
+  font-size: 18px;
+  color: #64748b;
+}

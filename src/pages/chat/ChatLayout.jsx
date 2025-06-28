@@ -1,18 +1,19 @@
-import { useParams } from 'react-router';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import styles from './ChatLayout.module.css';
-import ChatList from './chatPage/ChatList';
 import ChatRoom from './chatRoom/ChatRoom';
+import ChatList from './chatPage/ChatList';
 
 const ChatLayout = () => {
-  const { id } = useParams();
+  const { selectedChat } = useSelector((state) => state.chat);
 
   return (
     <div className={styles.container}>
-      <div className={styles.chatList}>
+      <div className={`${styles.left} ${selectedChat ? styles.hideOnMobile : ''}`}>
         <ChatList />
       </div>
-      <div className={styles.chatRoom}>
-        {id ? <ChatRoom /> : <p className={styles.welcome}>Bir söhbət seçin</p>}
+      <div className={`${styles.right} ${!selectedChat ? styles.hideOnMobile : ''}`}>
+        <ChatRoom />
       </div>
     </div>
   );

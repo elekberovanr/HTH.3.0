@@ -1,19 +1,27 @@
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../redux/reducers/userSlice';
 import styles from './Header.module.css';
 import { FiMenu, FiLogOut, FiLogIn, FiX } from 'react-icons/fi';
 import { useState } from 'react';
 import logo2 from '../../assets/logo2.png';
-import { BiAddToQueue, BiMessage, BiUser } from 'react-icons/bi';
+import {
+  BiAddToQueue,
+  BiMessage,
+  BiSupport,
+  BiUser,
+} from 'react-icons/bi';
 import { HiHeart } from 'react-icons/hi';
+import { TbRegistered } from 'react-icons/tb';
 
 function Header() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
   const [menuOpen, setMenuOpen] = useState(false);
-  const unreadCount = useSelector((state) => state.chat.unreadCount);
+  const notifications = useSelector((state) => state.chat.notifications || {});
+  const unreadCount = Object.values(notifications).reduce((sum, val) => sum + val, 0);
+
 
   const handleLogout = () => {
     const confirmLogout = window.confirm('Çıxış etmək istəyirsiniz?');
@@ -22,6 +30,9 @@ function Header() {
       navigate('/login');
     }
   };
+
+  // 👇 Adminsə göstərmə
+  if (user?.isAdmin) return null;
 
   return (
     <header className={styles.header}>
@@ -40,32 +51,45 @@ function Header() {
 
           {user ? (
             <>
-              <Link to="/add"><BiAddToQueue /></Link>
-              <Link to="/profile"><BiUser /></Link>
-              <Link to='/chat' className={styles.iconWrap}>
-                <div className={styles.bellWrapper}>
-                  <BiMessage />
-                  {unreadCount > 0 && (
-                    <span className={styles.badge}>{unreadCount}</span>
-                  )}
-                </div>
+              <Link to="/add">
+                <BiAddToQueue /> Add
               </Link>
 
-              <Link to="/favorites"><HiHeart /></Link>
-              <button className={styles.logoutBtn} onClick={handleLogout}>
-                <FiLogOut /> LogOut
+              <Link to="/favorites">
+                <HiHeart /> Favorites
+              </Link>
+
+              <Link to="/support">
+                <BiSupport /> Support
+              </Link>
+
+              <Link to="/chat" className={styles.chatLink}>
+                <BiMessage /> Chat
+                {unreadCount > 0 && (
+                  <span className={styles.chatNotif}>{unreadCount}</span>
+                )}
+              </Link>
+
+              <Link to="/profile">
+                <BiUser /> Profile
+              </Link>
+
+              <button onClick={handleLogout} className={styles.logoutBtn}>
+                <FiLogOut /> Logout
               </button>
             </>
           ) : (
-            <>
-              <Link to="/login"><FiLogIn /> Login</Link>
-              <Link to="/register">Register</Link>
-            </>
+            <div className={styles.login}>
+              <Link to="/login">
+                <FiLogIn /> Login
+              </Link>
+              <Link to="/register">
+                <TbRegistered /> Register
+              </Link>
+            </div>
           )}
         </nav>
       </div>
-
-      {menuOpen && <div className={styles.overlay} onClick={() => setMenuOpen(false)} />}
     </header>
   );
 }

@@ -3,7 +3,8 @@ import styles from './Sidebar.module.css';
 import { NavLink } from 'react-router';
 import {
   MdDashboard, MdPeople, MdCategory, MdOutlineLogout,
-  MdShoppingCart, MdPayment, MdNotifications
+  MdShoppingCart, MdPayment, MdNotifications,
+  MdSupportAgent
 } from 'react-icons/md';
 
 const Sidebar = () => {
@@ -17,6 +18,10 @@ const Sidebar = () => {
         <NavLink to="/admin/users" activeClassName={styles.active}>
           <MdPeople /> Users
         </NavLink>
+        <NavLink to='/admin/support' activeClassName={styles.active}>
+          <MdSupportAgent /> Support
+        </NavLink>
+
         <NavLink to="/admin/products" activeClassName={styles.active}>
           <MdShoppingCart /> Products
         </NavLink>
@@ -32,6 +37,7 @@ const Sidebar = () => {
         <NavLink to="/logout" activeClassName={styles.active}>
           <MdOutlineLogout /> Logout
         </NavLink>
+
       </nav>
     </div>
   );

@@ -20,6 +20,8 @@ import UsersList from '../pages/admin/users/UsersList';
 import AdminProducts from '../pages/admin/products/AdminProducts';
 import Favorites from '../pages/favorites/Favorites';
 import ProductDetail from '../pages/detailPage/ProductDetail';
+import UserSupport from '../pages/home/support/UserSupport';
+import AdminSupportPage from '../pages/admin/supportChat/AdminSupportPage';
 
 
 
@@ -40,47 +42,54 @@ const Router = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/favorites" element={<Favorites />} />
-        <Route path="product/:id" element={<ProductDetail/>} />
+        <Route path="product/:id" element={<ProductDetail />} />
+        <Route path="/support" element={<UserSupport />} />
 
+
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route
+            path="dashboard"
+            element={
+              <RequireAuth adminOnly={true}>
+                <Dashboard />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="categories"
+            element={
+              <RequireAuth adminOnly={true}>
+                <AddCategory />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="users"
+            element={
+              <RequireAuth adminOnly={true}>
+                <UsersList />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="products"
+            element={
+              <RequireAuth adminOnly={true}>
+                <AdminProducts />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="support"
+            element={
+              <RequireAuth adminOnly={true}>
+                <AdminSupportPage />
+              </RequireAuth>
+            }
+          />
+        </Route>
 
       </Route>
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route
-          path="dashboard"
-          element={
-            <RequireAuth adminOnly={true}>
-              <Dashboard />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="categories"
-          element={
-            <RequireAuth adminOnly={true}>
-              <AddCategory />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="users"
-          element={
-            <RequireAuth adminOnly={true}>
-              <UsersList />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="products"
-          element={
-            <RequireAuth adminOnly={true}>
-              <AdminProducts />
-            </RequireAuth>
-          }
-        />
-      </Route>
-
-
-
     </Routes>
 
   );
