@@ -1,12 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import API from '../../../services/api';
 import styles from './MyProducts.module.css';
-import { Link, useNavigate } from 'react-router';
-import { FiTrash2, FiEdit } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
+import { FiTrash2 } from 'react-icons/fi';
+import { BiPencil } from 'react-icons/bi';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Delete from '../../../components/delete/Delete';
+import { useSelector } from 'react-redux';
 
 const MyProducts = () => {
     const [products, setProducts] = useState([]);
-    const navigate = useNavigate();
+    const [showDialog, setShowDialog] = useState(false);
+    const [toDeleteId, setToDeleteId] = useState(null);
+    const theme = useSelector((state) => state.theme.mode);
+
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -14,29 +22,41 @@ const MyProducts = () => {
                 const res = await API.get('/products/my/products');
                 setProducts(res.data || []);
             } catch (err) {
-                console.error('Məhsullar alınmadı:', err);
+                console.error('Failed to fetch products:', err);
             }
         };
         fetchProducts();
     }, []);
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Bu məhsulu silmək istəyirsən?')) {
-            try {
-                await API.delete(`/products/${id}`);
-                setProducts((prev) => prev.filter((p) => p._id !== id));
-            } catch (err) {
-                console.error('Silinmə xətası:', err);
-            }
+    const askDelete = (id) => {
+        setToDeleteId(id);
+        setShowDialog(true);
+    };
+
+    const confirmDelete = async () => {
+        try {
+            await API.delete(`/products/${toDeleteId}`);
+            setProducts((prev) => prev.filter((p) => p._id !== toDeleteId));
+            toast.success('Product deleted successfully!', { autoClose: 2000 });
+        } catch (err) {
+            toast.error('Failed to delete the product.');
+            console.error('Delete error:', err);
+        } finally {
+            setShowDialog(false);
+            setToDeleteId(null);
         }
     };
 
+    const cancelDelete = () => {
+        setShowDialog(false);
+        setToDeleteId(null);
+    };
 
     return (
-        <div className={styles.container}>
+        <div className={`${styles.container} ${theme === 'dark' ? styles.dark : ''}`}>
             <div className={styles.grid}>
                 {products.length === 0 ? (
-                    <p className={styles.empty}>Sizin məhsulunuz yoxdur.</p>
+                    <p className={styles.empty}>No product yet...</p>
                 ) : (
                     products.map((product) => (
                         <div key={product._id} className={styles.card}>
@@ -45,27 +65,34 @@ const MyProducts = () => {
                                 alt={product.title}
                                 className={styles.image}
                             />
-                            <div className={styles.content}>
-                                <h4>{product.title}</h4>
-                                <p>{product.description?.slice(0, 50)}...</p>
-                                <div className={styles.icons}>
-                                    <Link to={`/profile/edit/${product._id}`}>
-                                        <FiEdit
-                                            className={styles.editIcon}
-                                            onClick={() => handleEdit(product._id)}
-                                            title="Redaktə et"
-                                        /> Edit</Link>
-                                    <FiTrash2
-                                        className={styles.deleteIcon}
-                                        onClick={() => handleDelete(product._id)}
-                                        title="Sil"
-                                    />
+                            <div className={styles.info}>
+                                <span className={styles.productTitle}>{product.title}</span>
+                                <p className={styles.desc}>{product.description?.slice(0, 60)}...</p>
+                                <div className={styles.actions}>
+                                    <Link to={`/profile/edit/${product._id}`} className={styles.editBtn}>
+                                        <BiPencil /> Edit
+                                    </Link>
+                                    <button
+                                        className={styles.deleteBtn}
+                                        onClick={() => askDelete(product._id)}
+                                        title="Delete product"
+                                    >
+                                        <FiTrash2 />
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     ))
                 )}
             </div>
+
+            <Delete
+                isOpen={showDialog}
+                onConfirm={confirmDelete}
+                onCancel={cancelDelete}
+            />
+
+            <ToastContainer position="top-center" />
         </div>
     );
 };

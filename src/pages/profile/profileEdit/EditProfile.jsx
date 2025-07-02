@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import API from '../../../services/api';
 import styles from './EditProfile.module.css';
 import { useNavigate } from 'react-router';
+import { FaPen } from 'react-icons/fa';
 
 const EditProfile = () => {
   const [formData, setFormData] = useState({
@@ -10,8 +11,9 @@ const EditProfile = () => {
     gender: '',
     birthday: '',
     profileImage: null,
+    bannerImage: null,
   });
-  const [preview, setPreview] = useState(null);
+  const [preview, setPreview] = useState({ profileImage: null, bannerImage: null });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,9 +28,13 @@ const EditProfile = () => {
           gender: user.gender || '',
           birthday: user.birthday ? user.birthday.slice(0, 10) : '',
           profileImage: null,
+          bannerImage: null,
         });
 
-        setPreview(user.profileImage ? `http://localhost:5555/uploads/${user.profileImage}` : null);
+        setPreview({
+          profileImage: user.profileImage ? `http://localhost:5555/uploads/${user.profileImage}` : null,
+          bannerImage: user.bannerImage ? `http://localhost:5555/uploads/${user.bannerImage}` : null,
+        });
       } catch (err) {
         console.error('User fetch error:', err);
       }
@@ -39,10 +45,10 @@ const EditProfile = () => {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === 'profileImage') {
+    if (files && files.length > 0) {
       const file = files[0];
-      setFormData((prev) => ({ ...prev, profileImage: file }));
-      setPreview(URL.createObjectURL(file));
+      setFormData((prev) => ({ ...prev, [name]: file }));
+      setPreview((prev) => ({ ...prev, [name]: URL.createObjectURL(file) }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -60,7 +66,6 @@ const EditProfile = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-
       navigate('/profile');
     } catch (err) {
       console.error('Profile update error:', err);
@@ -69,60 +74,42 @@ const EditProfile = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <h2 className={styles.title}>Profil Redaktəsi</h2>
-      <form onSubmit={handleSubmit} className={styles.form}>
-        {preview && (
-          <div className={styles.preview}>
-            <img src={preview} alt="Profil şəkli" />
-          </div>
+    <div className={styles.wrapper}>
+      <div className={styles.bannerWrapper}>
+        {preview.bannerImage && (
+          <img src={preview.bannerImage} alt="Banner" className={styles.bannerImage} />
         )}
+        <label className={styles.bannerEdit}>
+          <FaPen />
+          <input type="file" name="bannerImage" accept="image/*" onChange={handleChange} />
+        </label>
+      </div>
 
-        <input
-          type="file"
-          name="profileImage"
-          accept="image/*"
-          onChange={handleChange}
-        />
+      <div className={styles.profileBox}>
+        <div className={styles.profileImageWrapper}>
+          {preview.profileImage && (
+            <img src={preview.profileImage} alt="Profile" className={styles.avatar} />
+          )}
+          <label className={styles.profileEdit}>
+            <FaPen />
+            <input type="file" name="profileImage" accept="image/*" onChange={handleChange} />
+          </label>
+        </div>
 
-        <input
-          type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          placeholder="Adınız"
-          required
-        />
-
-        <input
-          type="text"
-          name="city"
-          value={formData.city}
-          onChange={handleChange}
-          placeholder="Şəhər"
-        />
-
-        <select
-          name="gender"
-          value={formData.gender}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Cins seçin</option>
-          <option value="male">Kişi</option>
-          <option value="female">Qadın</option>
-          <option value="other">Digər</option>
-        </select>
-
-        <input
-          type="date"
-          name="birthday"
-          value={formData.birthday}
-          onChange={handleChange}
-        />
-
-        <button type="submit" className={styles.button}>Yadda saxla</button>
-      </form>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <h2 className={styles.title}>Edit Profile</h2>
+          <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Name" required />
+          <input type="text" name="city" value={formData.city} onChange={handleChange} placeholder="City" />
+          <select name="gender" value={formData.gender} onChange={handleChange} required>
+            <option value="">Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+          <input type="date" name="birthday" value={formData.birthday} onChange={handleChange} />
+          <button type="submit" className={styles.button}>Save Changes</button>
+        </form>
+      </div>
     </div>
   );
 };

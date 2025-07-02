@@ -1,0 +1,32 @@
+.heartBtn {
+  padding: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 20px;
+  z-index: 2;
+  transition: transform 0.2s ease;
+}
+
+.filled {
+  color: #e74c3c;
+}
+
+.animate {
+  animation: pop 0.4s ease;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

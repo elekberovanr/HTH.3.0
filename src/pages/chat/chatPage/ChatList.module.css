@@ -1,36 +1,49 @@
+
 .chatList {
   padding: 20px;
-  background-color: #f3f4f6;
+  background-color: var(--card-bg);
   height: 100%;
   overflow-y: auto;
+  transition: background-color 0.3s ease;
 }
 
 .title {
   font-size: 18px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-color);
   margin-bottom: 20px;
 }
 
 .chatItem {
   display: flex;
   align-items: center;
-  background-color: #ffffff;
+  background-color: var(--card-bg);
   border-radius: 10px;
   padding: 10px;
   margin-bottom: 12px;
   cursor: pointer;
-  border: 1px solid #e5e7eb;
-  transition: background-color 0.2s;
+  border: 1px solid var(--border-color);
+  transition: background-color 0.2s ease;
 }
 
 .chatItem:hover {
-  background-color: #e0e7ff;
+  background-color: #e0f7f4;
+  color: var(--text-color);
+}
+
+[data-theme='dark'] .chatItem:hover {
+  background-color: #1e3532;
+  color: var(--text-color);
 }
 
 .active {
-  border: 2px solid #6366f1;
-  background-color: #eef2ff;
+  border: 2px solid var(--primary-color);
+  background-color: #e6f4f1;
+}
+
+[data-theme='dark'] .active {
+  background-color: #1e3532;
+  border-color: var(--primary-color);
 }
 
 .avatar {
@@ -47,16 +60,16 @@
 
 .name {
   font-weight: 600;
-  color: #111827;
+  color: var(--text-color);
 }
 
 .lastMsg {
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 13px;
 }
 
 .badge {
-  background-color: #4f46e5;
+  background-color: var(--primary-color);
   color: white;
   padding: 4px 8px;
   border-radius: 20px;

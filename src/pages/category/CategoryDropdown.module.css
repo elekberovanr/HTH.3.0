@@ -1,0 +1,19 @@
+.dropdown {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 8px 0;
+  min-width: 160px;
+}
+
+.item {
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-weight: 500;
+  color: #1b4b43;
+}
+
+.item:hover {
+  background-color: #f0f0f0;
+}

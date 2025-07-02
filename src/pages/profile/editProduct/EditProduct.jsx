@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router';
 import API from '../../../services/api';
 import styles from './EditProduct.module.css';
 import { FiUpload, FiSave } from 'react-icons/fi';
+import { useSelector } from 'react-redux';
 
 const EditProduct = () => {
   const { id } = useParams();
@@ -15,6 +16,9 @@ const EditProduct = () => {
   const [categories, setCategories] = useState([]);
   const [images, setImages] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
+  const theme = useSelector((state) => state.theme.mode);
+
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,14 +31,14 @@ const EditProduct = () => {
         });
         setExistingImages(productRes.data.images || []);
       } catch (err) {
-        console.error('Məhsul yüklənmədi:', err);
+        console.error('Failed to fetch product:', err);
       }
 
       try {
         const catRes = await API.get('/categories');
         setCategories(catRes.data);
       } catch (err) {
-        console.error('Kateqoriyalar alınmadı:', err);
+        console.error('Failed to fetch categories:', err);
       }
     };
     fetchData();
@@ -60,32 +64,34 @@ const EditProduct = () => {
       await API.put(`/products/${id}`, formData);
       navigate('/profile');
     } catch (err) {
-      console.error('Redaktə zamanı xəta:', err);
+      console.error('Update failed:', err);
     }
   };
 
   return (
-    <div className={styles.container}>
-      <h2 className={styles.title}>🖊️ Məhsulu Redaktə Et</h2>
+    <div className={`${styles.container} ${theme === 'dark' ? styles.dark : ''}`}>
+      <h2 className={styles.title}> Edit Product</h2>
       <form className={styles.form} onSubmit={handleSubmit}>
-        <label>Başlıq</label>
+        <label>Title</label>
         <input
           type="text"
           name="title"
           value={form.title}
           onChange={handleChange}
           required
+          className={styles.input}
         />
 
-        <label>Açıqlama</label>
+        <label>Description</label>
         <textarea
           name="description"
           value={form.description}
           onChange={handleChange}
           required
+          className={styles.textarea}
         />
 
-        <label>Kateqoriya</label>
+        <label>Category</label>
         <select
           name="category"
           value={form.category}
@@ -93,7 +99,7 @@ const EditProduct = () => {
           required
           className={styles.select}
         >
-          <option value="">Seçin</option>
+          <option value="">Select</option>
           {categories.map((cat) => (
             <option key={cat._id} value={cat._id}>
               {cat.name}
@@ -101,7 +107,7 @@ const EditProduct = () => {
           ))}
         </select>
 
-        <label>Yeni şəkillər</label>
+        <label>New Images</label>
         <div className={styles.uploadWrapper}>
           <input
             type="file"
@@ -117,7 +123,7 @@ const EditProduct = () => {
             <div key={idx} className={styles.card}>
               <img
                 src={`http://localhost:5555/uploads/${img}`}
-                alt="mevcut"
+                alt="existing"
                 className={styles.previewImg}
               />
             </div>
@@ -125,7 +131,7 @@ const EditProduct = () => {
         </div>
 
         <button type="submit" className={styles.saveBtn}>
-          <FiSave /> Yadda saxla
+          <FiSave /> Save
         </button>
       </form>
     </div>

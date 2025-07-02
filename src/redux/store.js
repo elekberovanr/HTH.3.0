@@ -5,6 +5,7 @@ import categoryReducer from './reducers/categorySlice';
 import filterReducer from './reducers/filterSlice';
 import favoriteReducer from './reducers/favoriteSlice';
 import chatReducer from './reducers/chatSlice';
+import themeReducer from './reducers/themeSlice';
 
 const store = configureStore({
   reducer: {
@@ -14,6 +15,8 @@ const store = configureStore({
     filters: filterReducer,
     favorites: favoriteReducer,
     chat: chatReducer,
+    theme: themeReducer, 
+
   },
   
 });

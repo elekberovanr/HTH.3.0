@@ -12,87 +12,31 @@ import ChatLayout from '../pages/chat/ChatLayout';
 import ForgotPassword from '../pages/login/forgotPassword/ForgotPassword';
 import ResetPassword from '../pages/login/resetPassword/ResetPassword';
 import EditProfile from '../pages/profile/profileEdit/EditProfile';
-import AdminLayout from '../pages/admin/adminLayout/AdminLayout';
-import Dashboard from '../pages/admin/dashboard/Dashboard';
-import RequireAuth from '../components/auth/RequireAuth';
-import AddCategory from '../pages/admin/category/AddCategory';
-import UsersList from '../pages/admin/users/UsersList';
-import AdminProducts from '../pages/admin/products/AdminProducts';
 import Favorites from '../pages/favorites/Favorites';
 import ProductDetail from '../pages/detailPage/ProductDetail';
 import UserSupport from '../pages/home/support/UserSupport';
-import AdminSupportPage from '../pages/admin/supportChat/AdminSupportPage';
-
-
 
 const Router = () => {
   return (
-
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Home />} />
-        <Route path="login" element={<Login />} />
-        <Route path="register" element={<Register />} />
-        <Route path="add" element={<AddProduct />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="profile/edit" element={<EditProfile />} />
-        <Route path="profile/edit/:id" element={<EditProduct />} />
-        <Route path="user/:id" element={<UserProfile />} />
-        <Route path="chat/:id?" element={<ChatLayout />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/favorites" element={<Favorites />} />
-        <Route path="product/:id" element={<ProductDetail />} />
-        <Route path="/support" element={<UserSupport />} />
-
-
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route
-            path="dashboard"
-            element={
-              <RequireAuth adminOnly={true}>
-                <Dashboard />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="categories"
-            element={
-              <RequireAuth adminOnly={true}>
-                <AddCategory />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="users"
-            element={
-              <RequireAuth adminOnly={true}>
-                <UsersList />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="products"
-            element={
-              <RequireAuth adminOnly={true}>
-                <AdminProducts />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="support"
-            element={
-              <RequireAuth adminOnly={true}>
-                <AdminSupportPage />
-              </RequireAuth>
-            }
-          />
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+          <Route path="add" element={<AddProduct />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="profile/edit" element={<EditProfile />} />
+          <Route path="profile/edit/:id" element={<EditProduct />} />
+          <Route path="user/:id" element={<UserProfile />} />
+          <Route path="chat/:id?" element={<ChatLayout />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/favorites" element={<Favorites />} />
+          <Route path="product/:id" element={<ProductDetail />} />
+          <Route path="/support" element={<UserSupport/>} />
         </Route>
-
-      </Route>
-    </Routes>
-
+      </Routes>
   );
 };
 
-export default Router
+export default Router;

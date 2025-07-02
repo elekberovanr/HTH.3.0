@@ -1,0 +1,99 @@
+:root {
+    --modal-bg: #ffffff;
+    --modal-text: #333;
+    --btn-green: #a6c36f;
+    --btn-gray: #f1f1f1;
+    --btn-border: #ccc;
+}
+
+[data-theme='dark'] {
+    --modal-bg: #2c3e50;
+    --modal-text: #ecf0f1;
+    --btn-gray: #3b4a58;
+    --btn-border: #555;
+}
+
+.overlay {
+    backdrop-filter: blur(3px);
+    background-color: rgba(0, 0, 0, 0.4);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background-color: var(--modal-bg, #fff);
+    padding: 24px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+}
+
+.title {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: var(--text-color, #333);
+}
+
+.text {
+    font-size: 16px;
+    color: var(--text-color, #555);
+    margin-bottom: 20px;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.cancel {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    color: #333;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.confirm {
+    background-color: #96b46d;
+    color: white;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+body.dark-mode .modal {
+    --modal-bg: #1e1e1e;
+    --text-color: #ddd;
+}
+
+@keyframes fadeInModal {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal {
+    animation: fadeInModal 0.3s ease-out;
+}

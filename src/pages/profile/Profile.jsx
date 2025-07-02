@@ -28,36 +28,57 @@ const Profile = () => {
     if (!profile) return <p className={styles.loading}>Yüklənir...</p>;
 
     return (
-        <div className={styles.container}>
-            {/* Profil bölməsi */}
-            <div className={styles.profileTop}>
-                <div className={styles.profileImage}>
+        <div className={styles.profileWrapper}>
+            <div className={styles.bannerWrapper}>
+                {profile.bannerImage && (
+                    <img
+                        src={
+                            profile.bannerImage
+                                ? `http://localhost:5555/uploads/${profile.bannerImage}`
+                                : '/banner-default.jpg'
+                        }
+                        alt="Banner"
+                        className={styles.bannerImage}
+                    />
+                )}
+            </div>
+
+            <div className={styles.profileBox}>
+                <div className={styles.avatarWrapper}>
                     {profile.profileImage ? (
-                        <img src={`http://localhost:5555/uploads/${profile.profileImage}`} alt="Profile" />
+                        <img
+                            src={`http://localhost:5555/uploads/${profile.profileImage}`}
+                            alt="Profile"
+                            className={styles.avatar}
+                        />
                     ) : (
                         <BiUserCircle className={styles.defaultIcon} />
                     )}
                 </div>
 
-                <div className={styles.profileInfo}>
+                <div className={styles.info}>
                     <h2>{profile.name}</h2>
                     <p className={styles.email}>{profile.email}</p>
 
                     <div className={styles.meta}>
-                        <p><strong><BiLocationPlus/></strong> {profile.city}</p>
-                        <p><strong><BsGenderAmbiguous/></strong> {profile.gender}</p>
-                        <p><strong><BiCake/></strong> {new Date(profile.birthday).toLocaleDateString()}</p>
+                        {profile.city && <p><CiLocationArrow1 className={styles.icon} /> {profile.city}</p>}
+                        {profile.gender && <p><BsGenderAmbiguous className={styles.icon} /> {profile.gender}</p>}
+                        {profile.birthday && <p><BiCake className={styles.icon} /> {new Date(profile.birthday).toLocaleDateString()}</p>}
                     </div>
 
                     <button className={styles.editBtn} onClick={() => navigate('/profile/edit')}>
                         <BiEdit /> Edit Profile
                     </button>
                 </div>
-
             </div>
-            <MyProducts />
+
+            <div className={styles.productsSection}>
+                <MyProducts />
+            </div>
         </div>
+
     );
+
 };
 
 export default Profile;

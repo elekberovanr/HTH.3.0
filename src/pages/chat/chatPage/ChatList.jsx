@@ -9,6 +9,7 @@ const ChatList = () => {
   const dispatch = useDispatch();
   const { chatList, selectedChatId } = useSelector((state) => state.chat);
   const user = useSelector((state) => state.user.user);
+  const theme = useSelector((state) => state.theme.mode);
   
 
   useEffect(() => {
@@ -27,7 +28,8 @@ const ChatList = () => {
   };
 
   return (
-    <div className={styles.chatList}>
+    <div className={`${styles.chatlist} ${theme === 'dark' ? 'dark' : ''}`}>
+
       <h3 className={styles.title}>Söhbətlər</h3>
       {chatList.map((chat) => {
         const otherUser = chat.participants.find((p) => p._id !== user._id);

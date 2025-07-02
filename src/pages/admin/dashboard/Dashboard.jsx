@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Dashboard.module.css';
-import API from '../../../services/api'; // Axios instance
-import { FaUser, FaBox, FaFolderOpen, FaDollarSign } from 'react-icons/fa';
+import API from '../../../services/api';
+import {
+  FaUser, FaBox, FaFolderOpen, FaDollarSign
+} from 'react-icons/fa';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -16,10 +18,9 @@ const Dashboard = () => {
     const fetchStats = async () => {
       try {
         const res = await API.get('/admin/stats');
-         console.log('Gelen statistikalar:', res.data); 
         setStats(res.data);
       } catch (err) {
-        console.error('Statistika yüklənmədi', err);
+        console.error('Stats loading failed', err);
       }
     };
     fetchStats();
@@ -27,38 +28,38 @@ const Dashboard = () => {
 
   return (
     <div className={styles.dashboard}>
-      <h2>Admin Dashboard</h2>
+      <h2 className={styles.title}>Welcome Admin</h2>
       <div className={styles.cards}>
         <div className={styles.card}>
           <FaUser className={styles.icon} />
           <h3>{stats.users}</h3>
-          <span>Users</span>
+          <p>Users</p>
         </div>
         <div className={styles.card}>
           <FaBox className={styles.icon} />
           <h3>{stats.products}</h3>
-          <span>Products</span>
+          <p>Products</p>
         </div>
         <div className={styles.card}>
           <FaFolderOpen className={styles.icon} />
           <h3>{stats.categories}</h3>
-          <span>Categories</span>
+          <p>Categories</p>
         </div>
         <div className={styles.card}>
           <FaDollarSign className={styles.icon} />
           <h3>${stats.income}</h3>
-          <span>Support Income</span>
+          <p>Support Income</p>
         </div>
       </div>
 
       <div className={styles.recentUsers}>
         <h3>Recent Users</h3>
-        <table>
+        <table className={styles.table}>
           <thead>
             <tr>
               <th>Name</th>
               <th>Email</th>
-              <th>Registered</th>
+              <th>Joined</th>
             </tr>
           </thead>
           <tbody>

@@ -48,42 +48,38 @@ const productSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Bütün məhsullar
       .addCase(fetchProducts.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(fetchProducts.fulfilled, (state, action) => {
-        state.loading = false;
-        state.items = action.payload;
-      })
-      .addCase(fetchProducts.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
-      })
+      state.loading = true;
+    })
+    .addCase(fetchProducts.fulfilled, (state, action) => {
+      state.loading = false;
+      state.items = action.payload;
+    })
+    .addCase(fetchProducts.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message;
+    })
 
-      // Yeni məhsul
-      .addCase(createProduct.fulfilled, (state, action) => {
-        state.items.unshift(action.payload);
-      })
+    .addCase(createProduct.fulfilled, (state, action) => {
+      state.items.unshift(action.payload);
+    })
 
-      // Məhsul sil
-      .addCase(deleteProduct.fulfilled, (state, action) => {
-        state.items = state.items.filter(p => p._id !== action.payload);
-      })
+    .addCase(deleteProduct.fulfilled, (state, action) => {
+      state.items = state.items.filter(p => p._id !== action.payload);
+    })
 
-      // Məhsul yenilə
-      .addCase(updateProduct.fulfilled, (state, action) => {
-        const index = state.items.findIndex(p => p._id === action.payload._id);
-        if (index !== -1) {
-          state.items[index] = action.payload;
-        }
-      })
+    .addCase(updateProduct.fulfilled, (state, action) => {
+      const index = state.items.findIndex(p => p._id === action.payload._id);
+      if (index !== -1) {
+        state.items[index] = action.payload;
+      }
+    })
 
-      // Kategoriya üzrə məhsullar
-      .addCase(fetchProductsByCategory.fulfilled, (state, action) => {
-        state.loading = false;
-        state.items = action.payload;
-      });
+    .addCase(fetchProductsByCategory.fulfilled, (state, action) => {
+      state.loading = false;
+      state.items = action.payload;
+    });
+
   }
 });
 

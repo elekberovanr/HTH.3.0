@@ -1,6 +1,5 @@
-// src/pages/admin/users/UsersList.jsx
 import React, { useEffect, useState } from 'react';
-import axios from '../../../services/api';
+import API from '../../../services/api';
 import styles from './UsersList.module.css';
 import { FiEdit3, FiTrash2, FiSave } from 'react-icons/fi';
 
@@ -9,59 +8,82 @@ const UsersList = () => {
   const [editUserId, setEditUserId] = useState(null);
   const [editData, setEditData] = useState({ username: '', email: '', password: '' });
 
-  const fetchUsers = async () => {
-    try {
-      const res = await axios.get('/users');
-      setUsers(res.data);
-    } catch (err) {
-      console.error('İstifadəçilər yüklənmədi');
-    }
-  };
-
   useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await API.get('/users');
+        setUsers(res.data);
+      } catch (err) {
+        console.error('Failed to fetch users');
+      }
+    };
     fetchUsers();
   }, []);
 
   const handleEdit = (user) => {
     setEditUserId(user._id);
-    setEditData({ username: user.username || '', email: user.email || '', password: '' });
+    setEditData({
+      username: user.username || '',
+      email: user.email || '',
+      password: ''
+    });
   };
 
   const handleSave = async () => {
     try {
-      await axios.put(`/users/${editUserId}`, editData);
+      const updated = {};
+      if (editData.username.trim()) updated.username = editData.username.trim();
+      if (editData.email.trim()) updated.email = editData.email.trim();
+      if (editData.password.trim()) updated.password = editData.password.trim();
+
+      const res = await API.put(`/admin/update-user/${editUserId}`, updated);
+      const data = res.data;
+
+      setUsers(prev =>
+        prev.map(user => user._id === editUserId ? { ...user, ...data } : user)
+      );
+
       setEditUserId(null);
       setEditData({ username: '', email: '', password: '' });
-      fetchUsers();
     } catch (err) {
-      alert('Dəyişikliklər yadda saxlanmadı');
+      alert('Save failed');
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('İstifadəçi silinsin?')) return;
+    if (!window.confirm('Are you sure you want to delete this user?')) return;
     try {
-      await axios.delete(`/users/${id}`);
-      fetchUsers();
-    } catch (err) {
-      alert('İstifadəçi silinmədi');
+      await API.delete(`/admin/delete-user/${id}`);
+      setUsers(users.filter(user => user._id !== id));
+    } catch {
+      alert('Delete failed');
     }
   };
 
   return (
     <div className={styles.container}>
-      <h2>İstifadəçilər</h2>
-      <ul className={styles.table}>
-        <li className={styles.headerRow}>
-          <span>Ad</span>
-          <span>Email</span>
-          <span>Şifrə</span>
-          <span>Əməliyyatlar</span>
-        </li>
+      <h2 className={styles.title}>User Management</h2>
+      <div className={styles.tableWrapper}>
+        <div className={`${styles.row} ${styles.header}`}>
+          <div>Profile</div>
+          <div>Username</div>
+          <div>Email</div>
+          <div>Password</div>
+          <div>Actions</div>
+        </div>
         {users.map((user) => (
-          <li key={user._id} className={styles.row}>
+          <div className={styles.row} key={user._id}>
             {editUserId === user._id ? (
               <>
+                <div>
+                  {user.profileImage && (
+                    <img
+                      src={`http://localhost:5555/uploads/${user.profileImage}`}
+                      alt="profile"
+                      className={styles.avatar}
+                    />
+                  )}
+                </div>
                 <input
                   type="text"
                   value={editData.username}
@@ -74,28 +96,37 @@ const UsersList = () => {
                 />
                 <input
                   type="password"
-                  placeholder="Yeni şifrə"
+                  placeholder="New password"
                   value={editData.password}
                   onChange={(e) => setEditData({ ...editData, password: e.target.value })}
                 />
-                <span className={styles.actions}>
+                <div className={styles.actions}>
                   <button onClick={handleSave}><FiSave /></button>
-                </span>
+                </div>
               </>
             ) : (
               <>
-                <span>{user.username}</span>
-                <span>{user.email}</span>
-                <span>••••••</span>
-                <span className={styles.actions}>
+                <div>
+                  {user.profileImage && (
+                    <img
+                      src={`http://localhost:5555/uploads/${user.profileImage}`}
+                      alt="profile"
+                      className={styles.avatar}
+                    />
+                  )}
+                </div>
+                <div>{user.username}</div>
+                <div>{user.email}</div>
+                <div>••••••</div>
+                <div className={styles.actions}>
                   <button onClick={() => handleEdit(user)}><FiEdit3 /></button>
                   <button onClick={() => handleDelete(user._id)}><FiTrash2 /></button>
-                </span>
+                </div>
               </>
             )}
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };

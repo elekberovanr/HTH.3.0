@@ -7,3 +7,30 @@
 body{
   font-family: poppins;
 }
+:root {
+  --bg-main: #f8f8fb;
+  --bg-chatbox: #f0f2f5;
+  --bg-header: #ffffff;
+  --bg-input: #fff;
+  --bg-msg-me: #4b4fc1;
+  --bg-msg-other: #e4e6eb;
+  --text-msg-me: #ffffff;
+  --text-msg-other: #000;
+  --text-muted: #aaa;
+  --border-color: #ddd;
+  --icon-color: #4b4fc1;
+}
+
+[data-theme='dark'] {
+  --bg-main: #1d1f21;
+  --bg-chatbox: #2a2c2e;
+  --bg-header: #2e2e2e;
+  --bg-input: #3a3a3a;
+  --bg-msg-me: #5c8aff;
+  --bg-msg-other: #444;
+  --text-msg-me: #fff;
+  --text-msg-other: #eee;
+  --text-muted: #bbb;
+  --border-color: #444;
+  --icon-color: #8de0d4;
+}

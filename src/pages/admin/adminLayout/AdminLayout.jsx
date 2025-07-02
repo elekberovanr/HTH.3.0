@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
-import { Link, Navigate, Outlet } from 'react-router';
+import { Outlet, Navigate } from 'react-router';
 import styles from './AdminLayout.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMe } from '../../../redux/reducers/userSlice';
+import Sidebar from '../sidebar/Sidebar';
 
 const AdminLayout = () => {
   const dispatch = useDispatch();
@@ -15,24 +16,12 @@ const AdminLayout = () => {
     }
   }, [dispatch, user]);
 
-  if (loading || !user) return <p>Yüklənir...</p>;
-  if (!user.isAdmin) return <Navigate to="/login" />;
+  if (loading) return <p className={styles.loading}>Loading...</p>;
+  if (!user || !user.isAdmin) return <Navigate to="/login" />;
 
   return (
-    <div className={styles.container}>
-      <aside className={styles.sidebar}>
-        <h2>Admin</h2>
-        <nav>
-          <Link to="/admin/dashboard">Dashboard</Link>
-          <Link to="/admin/users">Users</Link>
-          <Link to='/admin/support'>Support</Link>
-          <Link to="/admin/products">Products</Link>
-          <Link to="/admin/categories">Categories</Link>
-          <Link to="/admin/payments">Payments</Link>
-          <Link to="/admin/notifications">Notifications</Link>
-          <Link to="/login">Logout</Link>
-        </nav>
-      </aside>
+    <div className={styles.layout}>
+      <Sidebar />
       <main className={styles.content}>
         <Outlet />
       </main>

@@ -11,7 +11,7 @@ const socket = io('http://localhost:5555/support');
 const SupportChat = ({ user }) => {
   const [messages, setMessages] = useState([]);
   const [msg, setMsg] = useState('');
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]);
   const bottomRef = useRef(null);
   const dispatch = useDispatch();
 
@@ -23,7 +23,7 @@ const SupportChat = ({ user }) => {
   }, [user]);
 
   useEffect(() => {
-    socket.on('newMessage', (message) => {
+    const handler = (message) => {
       const isMine = message.sender === user._id || message.sender?._id === user._id;
       const isForMe = message.receiver === user._id || message.receiver?._id === user._id;
 
@@ -32,15 +32,14 @@ const SupportChat = ({ user }) => {
         dispatch(addMessage(message));
       }
 
-      // 🔔 Yalnız mənə gələn mesaj üçün bildiriş artır
       if (isForMe && !isMine) {
         dispatch(incrementUnread({ chatId: message.sender._id || message.sender }));
       }
-    });
+    };
 
-    return () => socket.off('newMessage');
+    socket.on('newMessage', handler);
+    return () => socket.off('newMessage', handler);
   }, [user, dispatch]);
-
 
   const fetchMessages = async () => {
     try {
@@ -52,16 +51,16 @@ const SupportChat = ({ user }) => {
   };
 
   const sendMessage = async () => {
-    if (!msg && !file) return;
+    if (!msg && files.length === 0) return;
+
     const formData = new FormData();
     formData.append('content', msg);
-    if (file) formData.append('image', file);
+    files.forEach(file => formData.append('image', file)); // çox şəkil, eyni ad: image
 
     try {
-      const res = await API.post(`/support/admin/${user._id}`, formData);
-      setMessages((prev) => [...prev, res.data]);
+      await API.post(`/support/admin/${user._id}`, formData);
       setMsg('');
-      setFile(null);
+      setFiles([]);
     } catch (err) {
       console.error('Mesaj göndərmə xətası:', err);
     }
@@ -71,6 +70,15 @@ const SupportChat = ({ user }) => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const handleFileChange = (e) => {
+    const selected = Array.from(e.target.files);
+    setFiles(prev => [...prev, ...selected]);
+  };
+
+  const removeFile = (index) => {
+    setFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
   return (
     <div className={styles.chatWrapper}>
       <div className={styles.header}>
@@ -79,7 +87,7 @@ const SupportChat = ({ user }) => {
           alt="profile"
           className={styles.avatar}
         />
-        <span className={styles.username}>{user.username}</span>
+        <span className={styles.username}>{user.email}</span>
       </div>
 
       <div className={styles.messages}>
@@ -88,19 +96,44 @@ const SupportChat = ({ user }) => {
             key={m._id}
             className={m.isAdmin ? styles.adminMessage : styles.userMessage}
           >
-            {m.image && (
-              <img
-                src={`http://localhost:5555/uploads/${m.image}`}
-                className={styles.image}
-                alt="img"
-              />
-            )}
             {m.content && <div className={styles.bubble}>{m.content}</div>}
-            <div className={styles.time}>{new Date(m.createdAt).toLocaleTimeString()}</div>
+
+            {Array.isArray(m.image) && m.image.map((img, i) => (
+              <img
+                key={i}
+                src={`http://localhost:5555/uploads/${img}`}
+                className={styles.image}
+                alt={`img-${i}`}
+              />
+            ))}
+
+            <div className={styles.time}>
+              {new Date(m.createdAt).toLocaleTimeString()}
+            </div>
           </div>
         ))}
         <div ref={bottomRef}></div>
       </div>
+
+      {files.length > 0 && (
+        <div className={styles.previewWrapper}>
+          {files.map((file, idx) => (
+            <div key={idx} className={styles.previewItem}>
+              <img
+                src={URL.createObjectURL(file)}
+                className={styles.previewImage}
+                alt={`preview-${idx}`}
+              />
+              <button
+                className={styles.removeImageBtn}
+                onClick={() => removeFile(idx)}
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className={styles.inputArea}>
         <input
@@ -108,15 +141,16 @@ const SupportChat = ({ user }) => {
           className={styles.input}
           value={msg}
           onChange={(e) => setMsg(e.target.value)}
-          placeholder="Mesaj yazın..."
+          placeholder="Mesaj yaz..."
         />
         <label className={styles.imageLabel}>
           <FaImage />
           <input
             type="file"
             accept="image/*"
+            multiple
             style={{ display: 'none' }}
-            onChange={(e) => setFile(e.target.files[0])}
+            onChange={handleFileChange}
           />
         </label>
         <button className={styles.sendButton} onClick={sendMessage}>

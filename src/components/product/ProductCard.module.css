@@ -1,133 +1,141 @@
 .card {
-  background-color: #fff;
+  background-color: var(--card-bg);
+  color: var(--text-color);
   border-radius: 10px;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   position: relative;
-  transition: transform 0.3s ease; 
-  
-  a{
-    text-decoration: none;
-  }
-}
-
-.card:hover {
-  transform: translateY(-5px);
-}
-
-.favoriteBtn {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  color: #e63946;
-  cursor: pointer;
-  z-index: 3;
-}
-
-.userInfo {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.75rem 1rem 0.5rem;
-  background-color: #f7f7f7;
- 
-}
-
-
-
-.profileImage {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid #ccc;
-}
-
-.username {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #333;
+  transition: background-color 0.3s ease;
+  max-width: 300px;
+  margin: auto;
 }
 
 .imageWrapper {
   width: 100%;
-  height: 190px;
+  height: 240px;
+  background-color: #eaeaea;
   overflow: hidden;
+  position: relative;
 }
 
 .productImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  display: block;
 }
 
-.imageWrapper:hover .productImage {
-  transform: scale(1.04);
+.favoriteBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  transition: transform 0.2s ease;
 }
 
-.content {
-  padding: 10px;
+.favoriteBtn:hover {
+  transform: scale(1.05);
+}
+
+.favoriteBtn svg {
+  font-size: 16px;
+  color: #d92626;
+}
+
+.cardContent {
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 8px;
+  flex-grow: 1;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  font-size: 13px;
+  color: var(--text-color);
+}
+
+.profileImage {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .title {
-  font-size: 1rem;
+  font-size: 14px;
   font-weight: 600;
-  color: #222;
+  margin: 0;
+  color: var(--primary-color);
 }
 
 .description {
-  font-size: 0.85rem;
-  color: #555;
-  line-height: 1.4;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.5;
 }
 
 .readMore {
-  background-color: #6fa6a3;
+  background-color: var(--button-bg);
   color: white;
-  padding: 0.6rem 1.2rem;
-  font-size: 0.9rem;
-  border-radius: 5px;
+  width: 100%;
+  font-weight: 600;
+  padding: 10px;
+  border-radius: 6px;
   text-align: center;
   text-decoration: none;
-  font-weight: 500;
-  transition: background-color 0.3s ease;
-  margin-top: auto;
+  transition: background-color 0.2s ease;
 }
 
 .readMore:hover {
-  background-color: #005fa3;
+  background-color: var(--button-bg-hover);
 }
 
-.moreImage {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-  border-top: 1px solid #eee;
-  margin-top: 5px;
-  transition: transform 0.3s ease;
+/* Responsive */
+@media (max-width: 600px) {
+  .card {
+    max-width: 100%;
+  }
+
+  .imageWrapper {
+    height: 160px;
+  }
 }
 
-.readMoreBtn {
-  margin: 10px;
-  padding: 6px 12px;
-  border: none;
-  background-color: #ffb703;
-  color: #fff;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background-color 0.3s ease;
+/* Light theme */
+:root {
+  --card-bg: #ffffff;
+  --text-color: #1b1b1b;
+  --text-muted: #666666;
+  --primary-color: #1b4b43;
+  --button-bg: #1b4b43;
+  --button-bg-hover: #163f38;
+  --border-color: #dddddd;
 }
 
-.readMoreBtn:hover {
-  background-color: #f77f00;
+/* Dark theme */
+[data-theme='dark'] {
+  --card-bg: #1f2b29;
+  --text-color: #f2f2f2;
+  --text-muted: #aaaaaa;
+  --primary-color: #8de0d4;
+  --button-bg: #295f58;
+  --button-bg-hover: #1e4a43;
+  --border-color: #334543;
 }

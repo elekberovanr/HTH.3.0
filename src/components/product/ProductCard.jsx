@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import styles from './ProductCard.module.css';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { addFavorite, removeFavorite, getFavorites } from '../../services/api';
+import LikeButton from '../like/LikeButton';
 
 const ProductCard = ({ product }) => {
   const user = useSelector(state => state.user.user);
@@ -30,16 +31,8 @@ const ProductCard = ({ product }) => {
         await removeFavorite(product._id);
         setIsFavorited(false);
       } else {
-        try {
-          await addFavorite(product._id);
-          setIsFavorited(true);
-        } catch (err) {
-          if (err.response?.data?.message === 'Artıq favoritdə var') {
-            setIsFavorited(true);
-          } else {
-            throw err;
-          }
-        }
+        await addFavorite(product._id);
+        setIsFavorited(true);
       }
     } catch (err) {
       console.error('Favori xətası:', err.response?.data || err.message);
@@ -50,41 +43,36 @@ const ProductCard = ({ product }) => {
 
   return (
     <div className={styles.card}>
-      <button className={styles.favoriteBtn} onClick={handleFavoriteClick}>
-        {isFavorited ? <FaHeart color="red" /> : <FaRegHeart />}
-      </button>
-
-      {product.user && (
-        <Link to={`/user/${product.user._id}`} className={styles.userInfo}>
-          {product.user.profileImage && (
-            <img
-              src={`http://localhost:5555/uploads/${product.user.profileImage}`}
-              alt={product.user.name || 'User'}
-              className={styles.profileImage}
-            />
-          )}
-          <span className={styles.username}>
-            {product.user.name || product.user.name || 'User'}
-          </span>
-        </Link>
-      )}
-
-
       <div className={styles.imageWrapper}>
         <img
           src={`http://localhost:5555/uploads/${product.images?.[0]}`}
           alt={product.title}
           className={styles.productImage}
         />
+       <LikeButton productId={product._id} />
       </div>
 
-      <div className={styles.content}>
+      <div className={styles.cardContent}>
+        {product.user && (
+          <Link to={`/user/${product.user._id}`} className={styles.userInfo}>
+            {product.user.profileImage && (
+              <img
+                src={`http://localhost:5555/uploads/${product.user.profileImage}`}
+                alt="user"
+                className={styles.profileImage}
+              />
+            )}
+            <span>{product.user.name || 'User'}</span>
+          </Link>
+        )}
+
         <h3 className={styles.title}>{product.title}</h3>
         <p className={styles.description}>
-          {product.description?.slice(0, 80)}...
+          {product.description?.slice(0, 20)}...
         </p>
+
         <Link to={`/product/${product._id}`} className={styles.readMore}>
-          Read More
+          Read more..
         </Link>
       </div>
     </div>

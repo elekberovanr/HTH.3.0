@@ -29,9 +29,10 @@ const AdminProducts = () => {
     setCategories(res.data);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm("Məhsul silinsin?")) {
-      dispatch(deleteProduct(id));
+  const handleDelete = async (id) => {
+    if (window.confirm("Delete this product?")) {
+      await axios.delete(`/admin/delete-product/${id}`);
+      dispatch(fetchProducts());
     }
   };
 
@@ -40,34 +41,34 @@ const AdminProducts = () => {
     setEditData({
       title: product.title,
       description: product.description,
-      category: product.category?._id || product.category
+      category: product.category?._id || product.category,
     });
   };
 
   const handleSave = () => {
-    dispatch(updateProduct({ id: editId, updatedData: editData }));
+    dispatch(updateProduct({ id: editId, data: editData }));
     setEditId(null);
     setEditData({ title: '', description: '', category: '' });
   };
 
-  const filteredProducts = products.filter(p =>
+  const filteredProducts = products.filter((p) =>
     (!filterEmail || p.user?.email?.includes(filterEmail)) &&
     (!filterCategory || p.category === filterCategory || p.category?._id === filterCategory)
   );
 
   return (
     <div className={styles.container}>
-      <h2>Admin - Məhsullar</h2>
+      <h2>Admin - Products</h2>
 
       <div className={styles.filterBar}>
         <input
           type="text"
-          placeholder="Email ilə axtar"
+          placeholder="Search by email"
           value={filterEmail}
           onChange={(e) => setFilterEmail(e.target.value)}
         />
         <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
-          <option value="">Bütün kateqoriyalar</option>
+          <option value="">All categories</option>
           {categories.map((cat) => (
             <option key={cat._id} value={cat._id}>{cat.name}</option>
           ))}
@@ -77,59 +78,62 @@ const AdminProducts = () => {
       <table className={styles.table}>
         <thead>
           <tr>
-            <th>Şəkil</th>
-            <th>Başlıq</th>
-            <th>Təsvir</th>
+            <th>Image</th>
+            <th>Title</th>
+            <th>Description</th>
             <th>Email</th>
-            <th>Kateqoriya</th>
-            <th>Əməliyyatlar</th>
+            <th>Category</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {filteredProducts.map((product) => (
             <tr key={product._id}>
-              <td>
-                <img src={`http://localhost:5555/${product.image}`} alt="product" />
+              <td data-label="Image">
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                  {product.images?.slice(0, 2).map((img, i) => (
+                    <img key={i} src={`http://localhost:5555/uploads/${img}`} alt="" />
+                  ))}
+                </div>
               </td>
+
               {editId === product._id ? (
                 <>
-                  <td>
+                  <td data-label="Title">
                     <input
-                      type="text"
                       value={editData.title}
                       onChange={(e) => setEditData({ ...editData, title: e.target.value })}
                     />
                   </td>
-                  <td>
+                  <td data-label="Description">
                     <input
-                      type="text"
                       value={editData.description}
                       onChange={(e) => setEditData({ ...editData, description: e.target.value })}
                     />
                   </td>
-                  <td>{product.user?.email || '-'}</td>
-                  <td>
+                  <td data-label="Email">{product.user?.email || '-'}</td>
+                  <td data-label="Category">
                     <select
                       value={editData.category}
                       onChange={(e) => setEditData({ ...editData, category: e.target.value })}
                     >
-                      <option value="">Seç</option>
+                      <option value="">Select</option>
                       {categories.map((cat) => (
                         <option key={cat._id} value={cat._id}>{cat.name}</option>
                       ))}
                     </select>
                   </td>
-                  <td className={styles.actions}>
+                  <td data-label="Actions" className={styles.actions}>
                     <button onClick={handleSave}><FiSave /></button>
                   </td>
                 </>
               ) : (
                 <>
-                  <td>{product.title}</td>
-                  <td>{product.description}</td>
-                  <td>{product.user?.email || '-'}</td>
-                  <td>{product.category?.name || '-'}</td>
-                  <td className={styles.actions}>
+                  <td data-label="Title">{product.title}</td>
+                  <td data-label="Description">{product.description}</td>
+                  <td data-label="Email">{product.user?.email || '-'}</td>
+                  <td data-label="Category">{product.category?.name || '-'}</td>
+                  <td data-label="Actions" className={styles.actions}>
                     <button onClick={() => handleEdit(product)}><FiEdit3 /></button>
                     <button onClick={() => handleDelete(product._id)}><FiTrash2 /></button>
                   </td>
