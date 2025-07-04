@@ -1,0 +1,107 @@
+.section {
+  padding: 40px 20px;
+  background-color: var(--card-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.heading {
+  font-size: 28px;
+  text-align: center;
+  color: var(--text-color);
+  margin-bottom: 24px;
+}
+
+.wrapper {
+    width: 80%;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.scrollContainer {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 16px;
+  padding: 10px 40px;
+  scrollbar-width: none;
+}
+
+.scrollContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.cardWrapper {
+  flex: 0 0 auto;
+  width: 270px;
+}
+
+.arrow {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.arrow-left {
+  left: 10px;
+}
+
+.arrow-right {
+  right: 10px;
+}
+
+.arrow:hover {
+  background-color: var(--button-bg-hover);
+}
+
+.spinnerWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 160px;
+}
+
+@media (max-width: 768px) {
+  .scrollContainer {
+    padding: 10px 20px;
+    gap: 12px;
+  }
+
+  .cardWrapper {
+    width: 230px;
+  }
+
+  .arrow {
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+  }
+}
+:root {
+  --card-bg: #ffffff;
+  --text-color: #1b1b1b;
+  --primary-color: #1b4b43;
+  --button-bg-hover: #163f38;
+}
+
+[data-theme='dark'] {
+  --card-bg: #1f2b29;
+  --text-color: #f2f2f2;
+  --primary-color: #8de0d4;
+  --button-bg-hover: #1e4a43;
+}

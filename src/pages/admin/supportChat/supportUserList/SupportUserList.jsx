@@ -2,55 +2,58 @@ import React, { useEffect, useState } from 'react';
 import styles from './SupportUserList.module.css';
 import API from '../../../../services/api';
 import { useSelector } from 'react-redux';
+import defaultAvatar from '../../../../assets/default-user.png';
 
 const SupportUserList = ({ onSelectUser, selectedUser }) => {
   const [users, setUsers] = useState([]);
-  const notifications = useSelector(state => state.chat.notifications);
+  const notifications = useSelector((state) => state.chat.notifications);
 
   useEffect(() => {
-    const fetchChats = async () => {
+    const fetchUsers = async () => {
       try {
         const res = await API.get('/support/admin');
         setUsers(res.data);
       } catch (err) {
-        console.error('İstifadəçi siyahısı alınmadı:', err);
+        console.error('Failed to fetch support users:', err);
       }
     };
-    fetchChats();
+
+    fetchUsers();
   }, []);
 
   return (
     <div className={styles.userList}>
-      {users.map((msg) => {
-        const isAdmin = msg.isAdmin;
-        const otherUser = isAdmin ? msg.receiver : msg.sender;
-        const unreadCount = notifications[otherUser._id];
+      {users.map((user) => {
+        const unreadCount = notifications[user._id];
+        const imageSrc = user.profileImage
+          ? user.profileImage.startsWith('http')
+            ? user.profileImage
+            : `http://localhost:5555/uploads/${user.profileImage}`
+          : defaultAvatar;
 
         return (
           <div
-            key={msg._id}
-            className={`${styles.userItem} ${selectedUser?._id === otherUser._id ? styles.active : ''}`}
-            onClick={() => onSelectUser(otherUser)}
+            key={user._id}
+            className={`${styles.userItem} ${selectedUser?._id === user._id ? styles.active : ''}`}
+            onClick={() => onSelectUser(user)}
           >
             <img
-              src={`http://localhost:5555/uploads/${otherUser.profileImage}`}
+              src={imageSrc}
               alt="profile"
               className={styles.avatar}
+              onError={(e) => (e.target.src = defaultAvatar)}
             />
             <div className={styles.details}>
               <div className={styles.nameWrapper}>
                 <div className={styles.nameEmail}>
-                  <div className={styles.name}>{otherUser.name}</div>
-                  <div className={styles.email}>{otherUser.email}</div>
+                  <div className={styles.name}>{user.name}</div>
+                  <div className={styles.email}>{user.email}</div>
                 </div>
-
                 {unreadCount > 0 && (
                   <span className={styles.notificationBadge}>{unreadCount}</span>
                 )}
               </div>
-              <div className={styles.lastMessage}>
-                {msg.content?.slice(0, 30)}
-              </div>
+              <div className={styles.lastMessage}> </div>
             </div>
           </div>
         );

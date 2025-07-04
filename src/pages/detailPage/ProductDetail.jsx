@@ -111,7 +111,7 @@ const ProductDetail = () => {
             ) : (
               <div className={styles.profileImage}>❓</div>
             )}
-            <span>{product.user?.name}</span>
+            <span className={styles.name}>{product.user?.name}</span>
           </div>
         </Link>
 

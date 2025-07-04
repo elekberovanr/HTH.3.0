@@ -3,11 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import styles from './CategoryDropdown.module.css';
 import { fetchCategories } from '../../redux/reducers/categorySlice';
 import { setSelectedCategory } from '../../redux/reducers/filterSlice';
-import { fetchProductsByCategory, fetchProducts } from '../../redux/reducers/productSlice';
+import { useNavigate } from 'react-router-dom';
 
 const CategoryDropdown = () => {
   const dispatch = useDispatch();
-  const { list: categories, loading, error } = useSelector(state => state.categories);
+  const navigate = useNavigate();
+  const { list: categories, loading } = useSelector((state) => state.categories);
 
   useEffect(() => {
     dispatch(fetchCategories());
@@ -15,15 +16,8 @@ const CategoryDropdown = () => {
 
   const handleClick = (name) => {
     dispatch(setSelectedCategory(name));
-    if (name) {
-      dispatch(fetchProductsByCategory(name));
-    } else {
-      dispatch(fetchProducts());
-    }
+    navigate('/search');
   };
-
-  if (loading) return <p>Yüklənir...</p>;
-  if (error) return <p>Xəta baş verdi: {error}</p>;
 
   return (
     <div className={styles.dropdown}>

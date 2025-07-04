@@ -8,6 +8,10 @@
   padding: 2rem;
   background-color: var(--background);
   transition: background-color 0.3s ease;
+   a{
+    text-decoration: none;
+    color: var(--text-color);
+  }
 }
 
 .imagesSection {
@@ -22,6 +26,7 @@
   flex-direction: column;
   align-items: center;
 }
+
 
 .mainImage {
   width: 100%;

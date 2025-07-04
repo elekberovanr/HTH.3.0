@@ -1,0 +1,98 @@
+.section {
+  margin: 60px 0;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: var(--text-color);
+  padding-left: 4px;
+  text-align: center;
+}
+
+.scrollContainer {
+  width: 80%;
+  display: flex;
+  overflow-x: auto;
+  gap: 32px;
+  padding-bottom: 16px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+}
+
+.scrollContainer::-webkit-scrollbar {
+  height: 8px;
+}
+
+.scrollContainer::-webkit-scrollbar-thumb {
+  background: #c2c2c2;
+  border-radius: 4px;
+}
+
+.card {
+  flex: 0 0 calc(30% - 24px);
+  min-width: 280px;
+  max-width: 320px;
+  background-color: var(--card-bg);
+  border-radius: 16px;
+  padding: 24px 18px;
+  text-align: center;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  scroll-snap-align: start;
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 14px;
+  border: 3px solid var(--avatar-border);
+  transition: transform 0.3s ease;
+}
+
+.card:hover .avatar {
+  transform: scale(1.05);
+}
+
+.name {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 10px;
+}
+
+.profileBtn {
+  font-size: 15px;
+  padding: 10px 20px;
+  background-color: var(--button-bg);
+  color: white;
+  text-decoration: none;
+  border-radius: 25px;
+  display: inline-block;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.profileBtn:hover {
+  background-color: var(--button-bg-hover);
+  transform: scale(1.05);
+}
+
+/* Mobile görünüş üçün */
+@media (max-width: 768px) {
+  .card {
+    flex: 0 0 75%;
+  }
+}

@@ -1,37 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { getFavorites, removeFavorite } from '../../services/api';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchFavorites, removeFromFavorites } from '../../redux/reducers/favoriteSlice';
 import styles from './Favorites.module.css';
 import ProductCard from '../../components/product/ProductCard';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
+
 
 const Favorites = () => {
-  const [favorites, setFavorites] = useState([]);
+  const dispatch = useDispatch();
+  const { items: favorites, loading, error } = useSelector(state => state.favorites);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    fetchFavorites();
-  }, []);
+    dispatch(fetchFavorites());
+  }, [dispatch]);
 
-  const fetchFavorites = async () => {
-    try {
-      const res = await getFavorites();
-      setFavorites(res);
-    } catch (err) {
-      console.error('Failed to load favorites:', err.message);
-    }
+  const handleRemove = (productId) => {
+    dispatch(removeFromFavorites(productId));
   };
 
-  const handleRemove = async (productId) => {
-    try {
-      await removeFavorite(productId);
-      setFavorites(prev => prev.filter(fav => fav.product._id !== productId));
-    } catch (err) {
-      console.error('Failed to remove:', err.message);
-    }
-  };
-
-  const filteredFavorites = favorites.filter(fav =>
-    fav.product?.title?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredFavorites = favorites
+    .filter(fav => fav.product?.title?.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
     <div className={styles.container}>
@@ -48,16 +37,20 @@ const Favorites = () => {
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
-      {filteredFavorites.length === 0 ? (
+      {loading ? (
+        <div className={styles.loadingWrapper}>
+          <LoadingSpinner />
+        </div>
+      ) : error ? (
+        <p className={styles.error}>Failed to load: {error}</p>
+      ) : filteredFavorites.length === 0 ? (
         <p className={styles.empty}>You haven't favorited any product yet.</p>
       ) : (
         <div className={styles.grid}>
-          {filteredFavorites.map((fav, idx) => (
-            fav.product && (
-              <div key={fav.product._id || idx} className={styles.cardWrapper}>
-                <ProductCard product={fav.product} />
-              </div>
-            )
+          {filteredFavorites.map((fav) => (
+            <div key={fav.product._id} className={styles.cardWrapper}>
+              <ProductCard product={fav.product} onRemove={() => handleRemove(fav.product._id)} />
+            </div>
           ))}
         </div>
       )}

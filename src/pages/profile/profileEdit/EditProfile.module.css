@@ -24,6 +24,23 @@
   align-items: center;
   background-color: var(--card-bg);
   color: var(--text-color);
+
+
+  input,
+  select {
+    padding: 0.8rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    font-size: 1rem;
+    background-color: transparent;
+    color: var(--text-color);
+  }
+
+  input:focus,
+  select:focus {
+    outline: 2px solid var(--primary-color);
+  }
+
 }
 
 .bannerWrapper {
@@ -119,21 +136,6 @@
   font-size: 1.8rem;
   margin-bottom: 1rem;
   color: var(--primary-color);
-}
-
-input,
-select {
-  padding: 0.8rem;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  font-size: 1rem;
-  background-color: transparent;
-  color: var(--text-color);
-}
-
-input:focus,
-select:focus {
-  outline: 2px solid var(--primary-color);
 }
 
 .button {

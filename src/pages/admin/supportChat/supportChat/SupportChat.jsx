@@ -1,68 +1,56 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './SupportChat.module.css';
-import { FaPaperPlane, FaImage } from 'react-icons/fa';
+import { FaImage, FaPaperPlane, FaTimes } from 'react-icons/fa';
 import API from '../../../../services/api';
 import { io } from 'socket.io-client';
-import { useDispatch } from 'react-redux';
-import { addMessage, incrementUnread, markChatAsRead } from '../../../../redux/reducers/chatSlice';
+import { useSelector } from 'react-redux';
 
 const socket = io('http://localhost:5555/support');
 
-const SupportChat = ({ user }) => {
+const SupportChat = ({ selectedUser, onBack }) => {
+  const admin = useSelector(state => state.user.user);
   const [messages, setMessages] = useState([]);
   const [msg, setMsg] = useState('');
-  const [files, setFiles] = useState([]);
-  const bottomRef = useRef(null);
-  const dispatch = useDispatch();
+  const [file, setFile] = useState(null);
+  const bottomRef = useRef();
 
   useEffect(() => {
-    if (!user) return;
-    socket.emit('registerSupportUser', user._id);
+    if (!selectedUser?._id) return;
+
     fetchMessages();
-    dispatch(markChatAsRead(user._id));
-  }, [user]);
+    socket.emit('registerSupportAdmin', admin._id);
 
-  useEffect(() => {
-    const handler = (message) => {
-      const isMine = message.sender === user._id || message.sender?._id === user._id;
-      const isForMe = message.receiver === user._id || message.receiver?._id === user._id;
+    socket.on('newMessage', (message) => {
+      const match =
+        (message.sender === selectedUser._id || message.sender?._id === selectedUser._id) ||
+        (message.receiver === selectedUser._id || message.receiver?._id === selectedUser._id);
+      if (match) setMessages((prev) => [...prev, message]);
+    });
 
-      if (isMine || isForMe) {
-        setMessages((prev) => [...prev, message]);
-        dispatch(addMessage(message));
-      }
-
-      if (isForMe && !isMine) {
-        dispatch(incrementUnread({ chatId: message.sender._id || message.sender }));
-      }
-    };
-
-    socket.on('newMessage', handler);
-    return () => socket.off('newMessage', handler);
-  }, [user, dispatch]);
+    return () => socket.off('newMessage');
+  }, [selectedUser]);
 
   const fetchMessages = async () => {
     try {
-      const res = await API.get(`/support/admin/${user._id}`);
+      const res = await API.get(`/support/admin/${selectedUser._id}`);
       setMessages(res.data);
     } catch (err) {
-      console.error('Mesajlar alınmadı:', err);
+      console.error('Failed to fetch messages:', err);
     }
   };
 
-  const sendMessage = async () => {
-    if (!msg && files.length === 0) return;
-
+  const handleSend = async () => {
+    if (!msg && !file) return;
     const formData = new FormData();
     formData.append('content', msg);
-    files.forEach(file => formData.append('image', file)); // çox şəkil, eyni ad: image
+    if (file) formData.append('image', file);
 
     try {
-      await API.post(`/support/admin/${user._id}`, formData);
+      await API.post(`/support/admin/${selectedUser._id}`, formData);
       setMsg('');
-      setFiles([]);
+      setFile(null);
     } catch (err) {
-      console.error('Mesaj göndərmə xətası:', err);
+      console.error('Failed to send message:', err);
     }
   };
 
@@ -70,90 +58,117 @@ const SupportChat = ({ user }) => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleFileChange = (e) => {
-    const selected = Array.from(e.target.files);
-    setFiles(prev => [...prev, ...selected]);
-  };
-
-  const removeFile = (index) => {
-    setFiles(prev => prev.filter((_, i) => i !== index));
-  };
-
   return (
-    <div className={styles.chatWrapper}>
+    <div className={styles.chatContainer}>
       <div className={styles.header}>
+        <button className={styles.backButton} onClick={onBack}>←</button>
         <img
-          src={`http://localhost:5555/uploads/${user.profileImage}`}
-          alt="profile"
-          className={styles.avatar}
+          src={
+            selectedUser?.profileImage
+              ? `http://localhost:5555/uploads/${selectedUser.profileImage}`
+              : '/default-avatar.png'
+          }
+          alt="user"
+          className={styles.profileImage}
         />
-        <span className={styles.username}>{user.email}</span>
+        <div>
+          <div className={styles.username}>{selectedUser.name}</div>
+          <div className={styles.email}>{selectedUser.email}</div>
+        </div>
       </div>
 
-      <div className={styles.messages}>
-        {messages.map((m) => (
-          <div
-            key={m._id}
-            className={m.isAdmin ? styles.adminMessage : styles.userMessage}
-          >
-            {m.content && <div className={styles.bubble}>{m.content}</div>}
+      <div className={styles.messageArea}>
+        {messages.map((m, i) => {
+          const isAdmin = m.sender === admin._id || m.sender?._id === admin._id;
+          const sender = m.sender || {};
+          const senderImage = sender.profileImage
+            ? `http://localhost:5555/uploads/${sender.profileImage}`
+            : '/default-avatar.png';
 
-            {Array.isArray(m.image) && m.image.map((img, i) => (
-              <img
-                key={i}
-                src={`http://localhost:5555/uploads/${img}`}
-                className={styles.image}
-                alt={`img-${i}`}
-              />
-            ))}
+          return (
+            <div
+              key={i}
+              className={`${styles.messageRow} ${isAdmin ? styles.user : styles.admin}`}
+            >
+              {!isAdmin && (
+                <img src={senderImage} alt="avatar" className={styles.avatar} />
+              )}
+              <div className={styles.bubbleWrapper}>
+                {Array.isArray(m.image) && m.image.length > 0 && (
+                  <div className={styles.imageGroup}>
+                    {m.image.map((img, index) => (
+                      <img
+                        key={index}
+                        src={`http://localhost:5555/uploads/${img}`}
+                        alt="media"
+                        className={styles.messageImage}
+                      />
+                    ))}
+                  </div>
+                )}
 
-            <div className={styles.time}>
-              {new Date(m.createdAt).toLocaleTimeString()}
+                {m.content && (
+                  <div className={styles.bubble}>
+                    {m.content}
+                    <span className={styles.time}>
+                      {new Date(m.createdAt).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                  </div>
+                )}
+
+                {!m.content && m.image?.length > 0 && (
+                  <span className={styles.time}>
+                    {new Date(m.createdAt).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </span>
+                )}
+              </div>
+
+              {isAdmin && (
+                <img src={senderImage} alt="avatar" className={styles.avatar} />
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
         <div ref={bottomRef}></div>
       </div>
 
-      {files.length > 0 && (
+      {file && (
         <div className={styles.previewWrapper}>
-          {files.map((file, idx) => (
-            <div key={idx} className={styles.previewItem}>
-              <img
-                src={URL.createObjectURL(file)}
-                className={styles.previewImage}
-                alt={`preview-${idx}`}
-              />
-              <button
-                className={styles.removeImageBtn}
-                onClick={() => removeFile(idx)}
-              >
-                ✕
-              </button>
-            </div>
-          ))}
+          <img
+            src={URL.createObjectURL(file)}
+            alt="preview"
+            className={styles.previewImage}
+          />
+          <button onClick={() => setFile(null)} className={styles.removeImage}>
+            <FaTimes />
+          </button>
         </div>
       )}
 
-      <div className={styles.inputArea}>
+      <div className={styles.inputSection}>
         <input
           type="text"
-          className={styles.input}
           value={msg}
           onChange={(e) => setMsg(e.target.value)}
-          placeholder="Mesaj yaz..."
+          placeholder="Type a message..."
+          className={styles.inputField}
         />
-        <label className={styles.imageLabel}>
+        <label className={styles.uploadIcon}>
           <FaImage />
           <input
             type="file"
+            hidden
             accept="image/*"
-            multiple
-            style={{ display: 'none' }}
-            onChange={handleFileChange}
+            onChange={(e) => setFile(e.target.files[0])}
           />
         </label>
-        <button className={styles.sendButton} onClick={sendMessage}>
+        <button onClick={handleSend} className={styles.sendButton}>
           <FaPaperPlane />
         </button>
       </div>

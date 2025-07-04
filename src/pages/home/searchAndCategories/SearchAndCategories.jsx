@@ -2,8 +2,7 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { fetchProductsByCategory, fetchProducts } from '../../../redux/reducers/productSlice';
 import styles from './SearchAndCategories.module.css'
-import CategoryDropdown from '../../category/CategoryDropdown';
-import SearchBar from './search/SearchBar';
+
 
 const SearchAndCategories = () => {
   const dispatch = useDispatch();

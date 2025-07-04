@@ -12,6 +12,7 @@ import {
   setSelectedChat,
 } from '../../../redux/reducers/chatSlice';
 import { FaArrowLeft } from 'react-icons/fa';
+import { BsImage } from 'react-icons/bs';
 
 const socket = io('http://localhost:5555');
 
@@ -24,6 +25,7 @@ const ChatRoom = () => {
   const [messages, setMessages] = useState([]);
   const [newMsg, setNewMsg] = useState('');
   const [file, setFile] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const chatBoxRef = useRef(null);
 
   const recipient = selectedChat?.participants?.find(p => p._id !== user._id);
@@ -44,22 +46,25 @@ const ChatRoom = () => {
       try {
         await API.put(`/chat/read/${user._id}`, { chatId: selectedChat._id });
         dispatch(markChatAsRead(selectedChat._id));
-        dispatch(fetchChats(user._id));
       } catch (err) {
-        console.error('Oxunmuş kimi qeyd edilə bilmədi:', err);
+        console.error('Read marking failed:', err);
       }
     };
     markRead();
   }, [selectedChat]);
 
+
   useEffect(() => {
     if (!selectedChat?._id) return;
     const fetchMessages = async () => {
       try {
+        setIsLoading(true);
         const res = await API.get(`/chat/messages/${selectedChat._id}`);
         setMessages(res.data);
       } catch (err) {
-        console.error('Mesajları almaqda xəta:', err);
+        console.error('Failed to load messages:', err);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchMessages();
@@ -95,7 +100,7 @@ const ChatRoom = () => {
       setNewMsg('');
       setFile(null);
     } catch (err) {
-      console.error('Mesaj göndərilə bilmədi:', err);
+      console.error('Message sending failed:', err);
     }
   };
 
@@ -104,7 +109,7 @@ const ChatRoom = () => {
     return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
   };
 
-  if (!selectedChat?._id) return <div className={styles.empty}>Bir chat seçin</div>;
+  if (!selectedChat?._id) return <div className={styles.empty}>Select a chat</div>;
 
   return (
     <div className={styles.chatRoom}>
@@ -112,33 +117,40 @@ const ChatRoom = () => {
         <FaArrowLeft onClick={() => dispatch(resetChat())} className={styles.backIcon} />
         <img
           src={`http://localhost:5555/uploads/${recipient?.profileImage || 'default.png'}`}
-          alt={recipient?.username || recipient?.name || 'Profil'}
+          alt={recipient?.username || recipient?.name || 'Profile'}
           className={styles.profileImage}
         />
         <h3>{recipient?.username || recipient?.name}</h3>
       </div>
 
       <div className={styles.chatBox} ref={chatBoxRef}>
-        {messages.map((msg) => {
-          const isMine = msg?.sender?._id === user?._id;
-          return (
-            <div key={msg._id} className={`${styles.messageRow} ${isMine ? styles.mine : styles.theirs}`}>
-              <div className={styles.bubbleContainer}>
-                <div className={styles.bubble}>
-                  {msg.content && <p>{msg.content}</p>}
-                  {msg.image && (
-                    <img
-                      src={`http://localhost:5555/uploads/${msg.image}`}
-                      alt="message"
-                      className={styles.messageImage}
-                    />
-                  )}
-                  <span className={styles.time}>{formatTime(msg.createdAt)}</span>
+        {isLoading ? (
+          <div className={styles.loadingSpinner}>
+            <div className={styles.spinner}></div>
+            <span>Loading messages...</span>
+          </div>
+        ) : (
+          messages.map((msg) => {
+            const isMine = msg?.sender?._id === user?._id;
+            return (
+              <div key={msg._id} className={`${styles.messageRow} ${isMine ? styles.mine : styles.theirs}`}>
+                <div className={styles.bubbleContainer}>
+                  <div className={styles.bubble}>
+                    {msg.content && <p>{msg.content}</p>}
+                    {msg.image && (
+                      <img
+                        src={`http://localhost:5555/uploads/${msg.image}`}
+                        alt="message"
+                        className={styles.messageImage}
+                      />
+                    )}
+                    <span className={styles.time}>{formatTime(msg.createdAt)}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
 
       {file && (
@@ -147,17 +159,10 @@ const ChatRoom = () => {
         </div>
       )}
 
-      <div className={styles.inputSection}>
-        <input
-          type="text"
-          value={newMsg}
-          onChange={(e) => setNewMsg(e.target.value)}
-          placeholder="Mesaj yaz..."
-          className={styles.inputField}
-        />
 
+      <div className={styles.inputSection}>
         <label htmlFor="file-upload" className={styles.uploadIcon}>
-          <BiImage />
+          <BsImage />
         </label>
         <input
           type="file"
@@ -166,12 +171,18 @@ const ChatRoom = () => {
           style={{ display: 'none' }}
           onChange={(e) => setFile(e.target.files[0])}
         />
+        <input
+          type="text"
+          value={newMsg}
+          onChange={(e) => setNewMsg(e.target.value)}
+          placeholder="Type a message..."
+          className={styles.inputField}
+        />
 
         <button className={styles.sendButton} onClick={sendMessage}>
           <BiSend />
         </button>
       </div>
-
     </div>
   );
 };

@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import styles from './ProductCard.module.css';
-import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { addFavorite, removeFavorite, getFavorites } from '../../services/api';
-import LikeButton from '../like/LikeButton';
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
 
 const ProductCard = ({ product }) => {
   const user = useSelector(state => state.user.user);
@@ -18,7 +17,7 @@ const ProductCard = ({ product }) => {
         const exists = favorites.some(f => f.product?._id === product._id);
         setIsFavorited(exists);
       } catch (err) {
-        console.error('Favoritləri alma xətası:', err.message);
+        console.error('Error checking favorites:', err.message);
       }
     };
     checkFavorite();
@@ -35,11 +34,17 @@ const ProductCard = ({ product }) => {
         setIsFavorited(true);
       }
     } catch (err) {
-      console.error('Favori xətası:', err.response?.data || err.message);
+      console.error('Favorite error:', err.response?.data || err.message);
     }
   };
 
   if (!product) return null;
+
+  const userData = product.user || product.userId;
+  const userName = userData?.name || 'User';
+  const profileImg = userData?.profileImage
+    ? `http://localhost:5555/uploads/${userData.profileImage}`
+    : '/default-user.png';
 
   return (
     <div className={styles.card}>
@@ -49,20 +54,17 @@ const ProductCard = ({ product }) => {
           alt={product.title}
           className={styles.productImage}
         />
-       <LikeButton productId={product._id} />
+
+        <button className={styles.favoriteBtn} onClick={handleFavoriteClick}>
+          {isFavorited ? <FaHeart className={styles.heartIcon} /> : <FaRegHeart className={styles.heartIcon} />}
+        </button>
       </div>
 
       <div className={styles.cardContent}>
-        {product.user && (
-          <Link to={`/user/${product.user._id}`} className={styles.userInfo}>
-            {product.user.profileImage && (
-              <img
-                src={`http://localhost:5555/uploads/${product.user.profileImage}`}
-                alt="user"
-                className={styles.profileImage}
-              />
-            )}
-            <span>{product.user.name || 'User'}</span>
+        {userData && (
+          <Link to={`/user/${userData._id}`} className={styles.userInfo}>
+            <img src={profileImg} alt="user" className={styles.profileImage} />
+            <span>{userName}</span>
           </Link>
         )}
 

@@ -14,7 +14,9 @@ import ResetPassword from '../pages/login/resetPassword/ResetPassword';
 import EditProfile from '../pages/profile/profileEdit/EditProfile';
 import Favorites from '../pages/favorites/Favorites';
 import ProductDetail from '../pages/detailPage/ProductDetail';
-import UserSupport from '../pages/home/support/UserSupport';
+import UserSupport from '../pages/support/UserSupport';
+import SearchPage from '../pages/searchPage/SearchPage';
+import SearchResults from '../components/search/SearchResults';
 
 const Router = () => {
   return (
@@ -34,6 +36,9 @@ const Router = () => {
           <Route path="/favorites" element={<Favorites />} />
           <Route path="product/:id" element={<ProductDetail />} />
           <Route path="/support" element={<UserSupport/>} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="results" element={<SearchResults />} />
+
         </Route>
       </Routes>
   );

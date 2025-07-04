@@ -37,8 +37,9 @@ export const removeFavorite = async (productId) => {
 };
 
 export const fetchCategories = async () => {
-  const res = await axios.get('/api/categories');
-  return res.data;
+  const res = await API.get('categories');
+  return Array.isArray(res.data) ? res.data : res.data.categories || [];
 };
+
 
 export default API;

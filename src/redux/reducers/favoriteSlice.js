@@ -1,39 +1,43 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import API from '../../services/API';
+import API from '../../services/api';
 
-
-export const fetchProducts = createAsyncThunk('products/fetchAll', async () => {
-  const res = await API.get('/products');
-  return res.data;
+export const fetchFavorites = createAsyncThunk('favorites/fetch', async () => {
+  const res = await API.get('/favorites');
+  return res.data.filter(fav => fav.product);
 });
 
-export const fetchProductsByCategory = createAsyncThunk('products/fetchByCategory', async (categoryId) => {
-  const res = await API.get(`/products/category/${categoryId}`);
-  return res.data;
-});
+export const removeFromFavorites = createAsyncThunk(
+  'favorites/remove',
+  async (productId) => {
+    await API.delete(`/favorites/${productId}`);
+    return productId;
+  }
+);
 
 const favoriteSlice = createSlice({
-  name: 'products',
+  name: 'favorites',
   initialState: {
     items: [],
     loading: false,
     error: null,
   },
+  reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchProducts.pending, (state) => {
+      .addCase(fetchFavorites.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
-      .addCase(fetchProducts.fulfilled, (state, action) => {
+      .addCase(fetchFavorites.fulfilled, (state, action) => {
         state.loading = false;
         state.items = action.payload;
       })
-      .addCase(fetchProducts.rejected, (state, action) => {
+      .addCase(fetchFavorites.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       })
-      .addCase(fetchProductsByCategory.fulfilled, (state, action) => {
-        state.items = action.payload;
+      .addCase(removeFromFavorites.fulfilled, (state, action) => {
+        state.items = state.items.filter(fav => fav.product?._id !== action.payload);
       });
   },
 });

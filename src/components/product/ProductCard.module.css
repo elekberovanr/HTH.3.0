@@ -1,14 +1,14 @@
 .card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   background-color: var(--card-bg);
   color: var(--text-color);
   border-radius: 10px;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
   position: relative;
   transition: background-color 0.3s ease;
-  max-width: 300px;
-  margin: auto;
 }
 
 .imageWrapper {
@@ -57,8 +57,8 @@
   padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
   flex-grow: 1;
+  justify-content: space-between;
 }
 
 .userInfo {
@@ -68,6 +68,7 @@
   text-decoration: none;
   font-size: 13px;
   color: var(--text-color);
+  margin-bottom: 8px;
 }
 
 .profileImage {
@@ -89,6 +90,9 @@
   color: var(--text-muted);
   margin: 0;
   line-height: 1.5;
+  max-height: 38px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .readMore {
@@ -101,18 +105,21 @@
   text-align: center;
   text-decoration: none;
   transition: background-color 0.2s ease;
+  margin-top: auto;
 }
 
 .readMore:hover {
   background-color: var(--button-bg-hover);
 }
 
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
-  .card {
-    max-width: 100%;
-  }
-
   .imageWrapper {
     height: 160px;
   }

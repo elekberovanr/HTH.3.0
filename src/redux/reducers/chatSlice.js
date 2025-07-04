@@ -12,8 +12,10 @@ const chatSlice = createSlice({
     chatList: [],
     selectedChat: null,
     selectedChatId: null,
-    notifications: {},  // 🔔 Bildirişlər üçün obyekt
-    messages: [],        // 🗨️ Əlavə mesajlar (istifadə oluna bilər)
+    notifications: {},
+    messages: [],
+    loading: false,
+    error: null,
   },
   reducers: {
     setSelectedChat: (state, action) => {
@@ -39,15 +41,24 @@ const chatSlice = createSlice({
       if (chat) chat.unreadCount = 0;
       delete state.notifications[chatId];
     },
-    // ✅ Yeni reducer: Mesaj əlavə et
     addMessage: (state, action) => {
       state.messages.push(action.payload);
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchChats.fulfilled, (state, action) => {
-      state.chatList = action.payload;
-    });
+    builder
+      .addCase(fetchChats.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchChats.fulfilled, (state, action) => {
+        state.loading = false;
+        state.chatList = action.payload;
+      })
+      .addCase(fetchChats.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
   },
 });
 
@@ -56,7 +67,7 @@ export const {
   resetChat,
   incrementUnread,
   markChatAsRead,
-  addMessage, // burada export olunmalıdır
+  addMessage,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

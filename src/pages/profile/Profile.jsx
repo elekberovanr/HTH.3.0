@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from '../../services/api';
 import styles from './Profile.module.css';
 import { useNavigate } from 'react-router';
-import { BiUserCircle, BiEdit, BiCake, BiLocationPlus } from 'react-icons/bi';
+import { BiUserCircle, BiEdit, BiCake, BiLocationPlus, BiPencil } from 'react-icons/bi';
 import MyProducts from './myProducts/MyProducts';
 import { CiLocationArrow1 } from 'react-icons/ci';
 import { BsGenderAmbiguous } from 'react-icons/bs';
@@ -67,7 +67,7 @@ const Profile = () => {
                     </div>
 
                     <button className={styles.editBtn} onClick={() => navigate('/profile/edit')}>
-                        <BiEdit /> Edit Profile
+                        <BiPencil /> Edit Profile
                     </button>
                 </div>
             </div>

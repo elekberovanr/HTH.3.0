@@ -4,17 +4,23 @@ import { FiUser, FiMail, FiLock, FiCalendar, FiMapPin, FiImage } from 'react-ico
 import { BsGenderAmbiguous } from 'react-icons/bs';
 import API from '../../services/api';
 import { useNavigate } from 'react-router';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const Register = () => {
   const [form, setForm] = useState({
     name: '',
     email: '',
     password: '',
+    confirmPassword: '',
     birthday: '',
     gender: '',
     city: '',
     profileImage: null,
   });
+
+  const [captchaToken, setCaptchaToken] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,33 +30,52 @@ const Register = () => {
   const handleFile = (e) => {
     setForm((prev) => ({ ...prev, profileImage: e.target.files[0] }));
   };
-  const navigate = useNavigate();
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleCaptcha = (token) => {
+    setCaptchaToken(token);
+  };
 
-  const formData = new FormData();
-  for (const key in form) {
-    if (form[key]) {
-      formData.append(key, form[key]);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (form.password.length < 8) {
+      return setError('Password must be at least 8 characters.');
     }
-  }
 
-  try {
-    await API.post('/auth/register', formData);
-    alert('✅ Qeydiyyat uğurla tamamlandı');
-    navigate('/login');
-  } catch (err) {
-    console.error('Xəta:', err.response?.data || err.message);
-    alert('❌ Qeydiyyat zamanı xəta baş verdi');
-  }
-};
+    if (form.password !== form.confirmPassword) {
+      return setError('Passwords do not match.');
+    }
 
+    if (!captchaToken) {
+      return setError('Please complete the captcha.');
+    }
+
+    const formData = new FormData();
+    for (const key in form) {
+      if (key !== 'confirmPassword' && form[key]) {
+        formData.append(key, form[key]);
+      }
+    }
+
+    formData.append('captcha', captchaToken);
+
+    try {
+      await API.post('/auth/register', formData);
+      alert('✅ Registration successful');
+      navigate('/login');
+    } catch (err) {
+      console.error('Error:', err.response?.data || err.message);
+      setError('❌ Registration failed');
+    }
+  };
 
   return (
     <div className={styles.container}>
       <div className={styles.card}>
         <h2 className={styles.title}>Register</h2>
+        {error && <p className={styles.error}>{error}</p>}
+
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.inputGroup}>
             <FiUser className={styles.icon} />
@@ -65,6 +90,11 @@ const handleSubmit = async (e) => {
           <div className={styles.inputGroup}>
             <FiLock className={styles.icon} />
             <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <FiLock className={styles.icon} />
+            <input type="password" name="confirmPassword" placeholder="Confirm Password" onChange={handleChange} required />
           </div>
 
           <div className={styles.inputGroup}>
@@ -87,9 +117,11 @@ const handleSubmit = async (e) => {
             <input type="text" name="city" placeholder="City" onChange={handleChange} required />
           </div>
 
-          <div className={styles.inputGroup}>
-            <FiImage className={styles.icon} />
-            <input type="file" name="profileImage" onChange={handleFile} accept="image/*" />
+          <div className={styles.captchaWrapper}>
+            <ReCAPTCHA
+              sitekey="6Lc1CXcrAAAAAHKmlnOxJEW-MOU2rF5HiJqgcqjV"
+              onChange={handleCaptcha}
+            />
           </div>
 
           <button type="submit" className={styles.button}>Register</button>

@@ -1,0 +1,59 @@
+.supportButton {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: var(--button-bg, #1b4b43);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  font-size: 22px;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+:root {
+  --card-bg: #ffffff;
+  --text-color: #1b1b1b;
+  --text-muted: #666666;
+  --primary-color: #1b4b43;
+  --text-on-primary: #ffffff;
+  --button-bg: #1b4b43;
+  --button-bg-hover: #163f38;
+  --border-color: #dddddd;
+  --avatar-border: #ffffff;
+}
+
+[data-theme='dark'] {
+  --card-bg: #1f2b29;
+  --text-color: #f2f2f2;
+  --text-muted: #aaaaaa;
+  --primary-color: #295f58;
+  --text-on-primary: #ffffff;
+  --button-bg: #295f58;
+  --button-bg-hover: #1e4a43;
+  --border-color: #334543;
+  --avatar-border: #2c4f4c;
+}
+
+
+.supportButton:hover {
+  background-color: var(--button-bg-hover, #163f38);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 480px) {
+  .supportButton {
+    width: 48px;
+    height: 48px;
+    font-size: 18px;
+    bottom: 16px;
+    right: 16px;
+  }
+}

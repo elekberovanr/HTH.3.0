@@ -1,9 +1,22 @@
+:root {
+  --dropdown-bg: #ffffff;
+  --item-color: #1b4b43;
+  --item-hover: #f0f0f0;
+}
+
+[data-theme='dark'] {
+  --dropdown-bg: #2a3b39;
+  --item-color: #8de0d4;
+  --item-hover: #3a4f4c;
+}
+
 .dropdown {
-  background-color: #fff;
+  background-color: var(--dropdown-bg);
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 8px 0;
   min-width: 160px;
+  transition: background-color 0.3s ease;
 }
 
 .item {
@@ -11,9 +24,9 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
   font-weight: 500;
-  color: #1b4b43;
+  color: var(--item-color);
 }
 
 .item:hover {
-  background-color: #f0f0f0;
+  background-color: var(--item-hover);
 }
