@@ -22,7 +22,7 @@ const ForgotPassword = () => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.card}>
-        <h2 className={styles.title}>Şifrəni Unutmusan?</h2>
+        <h2 className={styles.title}>Forgot password?</h2>
         <form onSubmit={handleSendCode} className={styles.form}>
           <input
             type="email"
@@ -32,7 +32,7 @@ const ForgotPassword = () => {
             required
             className={styles.input}
           />
-          <button type="submit" className={styles.button}>Kod Göndər</button>
+          <button type="submit" className={styles.button}>Send code</button>
           {error && <p className={styles.error}>{error}</p>}
         </form>
       </div>

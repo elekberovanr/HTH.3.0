@@ -1,0 +1,32 @@
+.notFound {
+  text-align: center;
+  padding: 100px 20px;
+  color: var(--text-color);
+  background-color: var(--card-bg);
+  min-height: 80vh;
+}
+
+.notFound h1 {
+  font-size: 96px;
+  margin-bottom: 20px;
+}
+
+.notFound p {
+  font-size: 20px;
+  margin-bottom: 30px;
+}
+
+.notFound button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.notFound button:hover {
+  background-color: var(--button-bg-hover);
+}

@@ -45,15 +45,19 @@ const ChatList = () => {
               onClick={() => handleChatClick(chat)}
             >
               <img
-                src={`http://localhost:5555/uploads/${otherUser.profileImage}`}
-                alt={otherUser.username}
+                src={`http://localhost:5555/uploads/${otherUser.profileImage || 'default.png'}`}
+                alt={otherUser.username || otherUser.name}
                 className={styles.avatar}
               />
               <div className={styles.chatInfo}>
                 <p className={styles.name}>{otherUser.username || otherUser.name}</p>
-                <p className={styles.lastMsg}>{chat.lastMessage?.content || 'No messages yet'}</p>
+                <p className={styles.lastMsg}>
+                  {chat.lastMessage?.content || (chat.lastMessage?.image ? '📷 Photo' : 'No messages yet')}
+                </p>
               </div>
-              {chat.unreadCount > 0 && <span className={styles.badge}>{chat.unreadCount}</span>}
+              {chat.unreadCount > 0 && (
+                <span className={styles.badge}>{chat.unreadCount}</span>
+              )}
             </div>
           );
         })

@@ -1,10 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import API from '../../services/api';
 
-export const fetchChats = createAsyncThunk('chat/fetchChats', async (userId) => {
-  const res = await API.get(`/chat/user/${userId}`);
-  return res.data;
-});
+export const fetchChats = createAsyncThunk(
+  'chat/fetchChats',
+  async (userId, thunkAPI) => {
+    const res = await API.get(`/chat/user/${userId}`);
+    return res.data;
+  }
+);
 
 const chatSlice = createSlice({
   name: 'chat',
@@ -12,38 +15,47 @@ const chatSlice = createSlice({
     chatList: [],
     selectedChat: null,
     selectedChatId: null,
-    notifications: {},
-    messages: [],
     loading: false,
     error: null,
+    notifications: {}, // ✅ for support users only
   },
   reducers: {
     setSelectedChat: (state, action) => {
       state.selectedChat = action.payload;
-      state.selectedChatId = action.payload?._id;
-      if (action.payload?._id) {
-        delete state.notifications[action.payload._id];
-      }
+      state.selectedChatId = action.payload._id;
     },
     resetChat: (state) => {
       state.selectedChat = null;
       state.selectedChatId = null;
     },
-    incrementUnread: (state, action) => {
-      const { chatId } = action.payload;
-      const chat = state.chatList.find(c => c._id === chatId);
-      if (chat) chat.unreadCount = (chat.unreadCount || 0) + 1;
-      state.notifications[chatId] = (state.notifications[chatId] || 0) + 1;
-    },
     markChatAsRead: (state, action) => {
       const chatId = action.payload;
-      const chat = state.chatList.find(c => c._id === chatId);
-      if (chat) chat.unreadCount = 0;
-      delete state.notifications[chatId];
+      const chat = state.chatList.find((c) => c._id === chatId);
+      if (chat) {
+        chat.unreadCount = 0;
+      }
     },
-    addMessage: (state, action) => {
-      state.messages.push(action.payload);
+    incrementUnread: (state, action) => {
+      const { chatId, count = 1 } = action.payload;
+      if (state.notifications[chatId]) {
+        state.notifications[chatId] += count;
+      } else {
+        state.notifications[chatId] = count;
+      }
+      const chat = state.chatList.find((c) => c._id === chatId);
+      if (chat) {
+        chat.unreadCount = (chat.unreadCount || 0) + count;
+      }
     },
+    resetUnread: (state, action) => {
+      const chatId = action.payload;
+      if (state.notifications[chatId]) {
+        state.notifications[chatId] = 0;
+      }
+    },
+    clearAllSupportNotifications: (state) => {
+      state.notifications = {};
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -65,9 +77,10 @@ const chatSlice = createSlice({
 export const {
   setSelectedChat,
   resetChat,
-  incrementUnread,
   markChatAsRead,
-  addMessage,
+  incrementUnread,
+  resetUnread,
+  clearAllSupportNotifications,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

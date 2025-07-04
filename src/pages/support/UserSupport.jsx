@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { io } from 'socket.io-client';
 import { FaPaperPlane, FaImage, FaTimes } from 'react-icons/fa';
 import adminImage from '../../assets/admin-default.png';
+import { resetUnread } from '../../redux/reducers/chatSlice';
 
 const socket = io('http://localhost:5555/support');
 
@@ -20,6 +21,7 @@ const UserSupport = () => {
 
     socket.emit('registerSupportUser', user._id);
     fetchMessages();
+    markMessagesAsRead();
 
     const handleMessage = (message) => {
       const isRelevant =
@@ -51,6 +53,16 @@ const UserSupport = () => {
       console.error('Mesajlar yüklənmədi:', err.response?.data || err.message);
     }
   };
+
+  const markMessagesAsRead = async () => {
+  try {
+    await API.put(`/support/mark-read/${user._id}`, { chatWith: null });
+    dispatch(resetUnread(user._id));
+  } catch (err) {
+    console.error('Mesajlar oxundu kimi işarələnə bilmədi:', err.message);
+  }
+};
+
 
   const handleSend = async () => {
     if (!msg.trim() && !file) return;
@@ -157,7 +169,7 @@ const UserSupport = () => {
           type="text"
           value={msg}
           onChange={(e) => setMsg(e.target.value)}
-          placeholder="Mesaj yaz..."
+          placeholder="Type..."
           className={styles.input}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
         />

@@ -95,6 +95,9 @@ function Header() {
               <>
                 <Link to="/login" className={styles.icon}>Login</Link>
                 <Link to="/register" className={styles.icon}>Register</Link>
+                <button onClick={() => dispatch(toggleTheme())} className={styles.themeToggle}>
+                  {theme === 'dark' ? <FiSun /> : <FiMoon />}
+                </button>
               </>
             )}
 
@@ -119,6 +122,7 @@ function Header() {
                 {unreadCount > 0 && <span className={styles.badge}>{unreadCount}</span>}
                 Chat
               </Link>
+
               <div className={styles.dropdownWrapper}>
                 <span className={styles.navItem}>Categories <MdKeyboardArrowDown /></span>
                 <div className={styles.dropdownContent}>
@@ -130,6 +134,9 @@ function Header() {
             <>
               <Link to="/login" className={styles.navItem}> Login</Link>
               <Link to="/register" className={styles.navItem}>Register</Link>
+              <button onClick={() => dispatch(toggleTheme())} className={styles.themeToggle}>
+                {theme === 'dark' ? <FiSun /> : <FiMoon />}
+              </button>
             </>
           )}
         </nav>

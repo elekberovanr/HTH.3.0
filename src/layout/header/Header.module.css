@@ -6,6 +6,10 @@
   z-index: 1000;
   width: 100%;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+  a{
+    text-decoration: none;
+  }
 }
 
 .themeToggle {
@@ -73,15 +77,21 @@
 }
 
 .badge {
+  position: absolute;
+  top: -6px;
+  right: -10px;
   background-color: red;
   color: white;
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: bold;
   padding: 2px 6px;
-  border-radius: 999px;
-  position: relative;
-  top: -8px;
-  right: -4px;
+  border-radius: 50%;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
 
 .right {
   display: flex;

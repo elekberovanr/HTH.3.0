@@ -59,13 +59,13 @@ const Login = () => {
             />
           </div>
 
-          <button type="submit" className={styles.button}>Daxil ol</button>
+          <button type="submit" className={styles.button}>Login</button>
 
           <p className={styles.linkText}>
-            <Link to="/forgot-password">Şifrəni unutmusunuz?</Link>
+            <Link to="/forgot-password">Forgot password?</Link>
           </p>
           <p className={styles.linkText}>
-            Hesabınız yoxdur? <Link to="/register">Qeydiyyat</Link>
+            Not have a profile? <Link to="/register">Register</Link>
           </p>
         </form>
       </div>

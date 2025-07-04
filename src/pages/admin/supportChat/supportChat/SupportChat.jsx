@@ -3,12 +3,14 @@ import styles from './SupportChat.module.css';
 import { FaImage, FaPaperPlane, FaTimes } from 'react-icons/fa';
 import API from '../../../../services/api';
 import { io } from 'socket.io-client';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { incrementUnread, setSelectedChat } from '../../../../redux/reducers/chatSlice';
 
 const socket = io('http://localhost:5555/support');
 
 const SupportChat = ({ selectedUser, onBack }) => {
   const admin = useSelector(state => state.user.user);
+  const dispatch = useDispatch();
   const [messages, setMessages] = useState([]);
   const [msg, setMsg] = useState('');
   const [file, setFile] = useState(null);
@@ -18,17 +20,41 @@ const SupportChat = ({ selectedUser, onBack }) => {
     if (!selectedUser?._id) return;
 
     fetchMessages();
+    dispatch(setSelectedChat({ _id: selectedUser._id }));
     socket.emit('registerSupportAdmin', admin._id);
 
-    socket.on('newMessage', (message) => {
+    const handleNewMessage = (message) => {
       const match =
         (message.sender === selectedUser._id || message.sender?._id === selectedUser._id) ||
         (message.receiver === selectedUser._id || message.receiver?._id === selectedUser._id);
-      if (match) setMessages((prev) => [...prev, message]);
-    });
 
-    return () => socket.off('newMessage');
+      if (match) {
+        setMessages((prev) => [...prev, message]);
+      } else {
+        const otherId = message.sender?._id || message.sender;
+        dispatch(incrementUnread({ chatId: otherId }));
+      }
+    };
+
+    socket.on('newMessage', handleNewMessage);
+    return () => socket.off('newMessage', handleNewMessage);
   }, [selectedUser]);
+
+  useEffect(() => {
+    if (!selectedUser?._id || !admin?._id) return;
+
+    const markAsRead = async () => {
+      try {
+        await API.put(`/support/mark-read/${admin._id}`, {
+          chatWith: selectedUser._id,
+        });
+      } catch (err) {
+        console.error('Failed to mark messages as read:', err);
+      }
+    };
+
+    markAsRead();
+  }, [selectedUser, admin]);
 
   const fetchMessages = async () => {
     try {

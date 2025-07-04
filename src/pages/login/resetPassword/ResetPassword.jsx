@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
-import styles from './ResetPassword.module.css'; // 💡 CSS modul əlavə olunur
+import styles from './ResetPassword.module.css'; 
 
 const ResetPassword = () => {
   const [email, setEmail] = useState('');
