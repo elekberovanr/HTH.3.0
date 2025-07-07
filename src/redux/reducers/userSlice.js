@@ -24,13 +24,16 @@ const userSlice = createSlice({
     logout: (state) => {
       state.token = null;
       state.user = null;
-      localStorage.removeItem('accessToken'); 
+      localStorage.removeItem('accessToken');
       localStorage.removeItem('user');
     },
     setToken: (state, action) => {
-      state.token = action.payload;
-      localStorage.setItem('accessToken', action.payload); 
-    },
+      state.token = action.payload.token;
+      state.user = action.payload.user;
+      localStorage.setItem('accessToken', action.payload.token);
+      localStorage.setItem('user', JSON.stringify(action.payload.user));
+    }
+
   },
   extraReducers: (builder) => {
     builder
@@ -40,7 +43,7 @@ const userSlice = createSlice({
       .addCase(fetchMe.fulfilled, (state, action) => {
         state.user = action.payload;
         state.loading = false;
-        localStorage.setItem('user', JSON.stringify(action.payload)); 
+        localStorage.setItem('user', JSON.stringify(action.payload));
       })
       .addCase(fetchMe.rejected, (state, action) => {
         state.error = action.payload;

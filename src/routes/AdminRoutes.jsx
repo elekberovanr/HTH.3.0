@@ -9,6 +9,7 @@ import AdminProducts from '../pages/admin/products/AdminProducts';
 import AdminSupportPage from '../pages/admin/supportChat/AdminSupportPage';
 import RequireAuth from '../components/auth/RequireAuth';
 import LogoutConfirmModal from '../pages/admin/logOutConfirmModal/LogoutConfirmModal';
+import AdminPayments from '../pages/admin/payment/AdminPayments';
 
 const AdminRouter = () => (
   <Routes>
@@ -19,6 +20,8 @@ const AdminRouter = () => (
       <Route path="products" element={<RequireAuth adminOnly={true}><AdminProducts /></RequireAuth>} />
       <Route path="support" element={<RequireAuth adminOnly={true}><AdminSupportPage /></RequireAuth>} />
       <Route path="logout" element={<RequireAuth adminOnly={true}><LogoutConfirmModal /></RequireAuth>} />
+      <Route path="payments" element={<RequireAuth adminOnly={true}><AdminPayments/></RequireAuth>} />
+     
     </Route>
   </Routes>
 );

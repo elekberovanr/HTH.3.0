@@ -14,6 +14,7 @@ const SupportChat = ({ selectedUser, onBack }) => {
   const [messages, setMessages] = useState([]);
   const [msg, setMsg] = useState('');
   const [file, setFile] = useState(null);
+  const [isClosed, setIsClosed] = useState(false);
   const bottomRef = useRef();
 
   useEffect(() => {
@@ -29,15 +30,24 @@ const SupportChat = ({ selectedUser, onBack }) => {
         (message.receiver === selectedUser._id || message.receiver?._id === selectedUser._id);
 
       if (match) {
-        setMessages((prev) => [...prev, message]);
+        setMessages(prev => [...prev, message]);
       } else {
         const otherId = message.sender?._id || message.sender;
         dispatch(incrementUnread({ chatId: otherId }));
       }
     };
 
+    const handleTicketStatus = ({ closed }) => {
+      setIsClosed(closed);
+    };
+
     socket.on('newMessage', handleNewMessage);
-    return () => socket.off('newMessage', handleNewMessage);
+    socket.on('ticketStatusChanged', handleTicketStatus);
+
+    return () => {
+      socket.off('newMessage', handleNewMessage);
+      socket.off('ticketStatusChanged', handleTicketStatus);
+    };
   }, [selectedUser]);
 
   useEffect(() => {
@@ -59,9 +69,19 @@ const SupportChat = ({ selectedUser, onBack }) => {
   const fetchMessages = async () => {
     try {
       const res = await API.get(`/support/admin/${selectedUser._id}`);
-      setMessages(res.data);
+      setMessages(res.data.messages || []);
+      setIsClosed(res.data.isClosed ?? false);
     } catch (err) {
       console.error('Failed to fetch messages:', err);
+    }
+  };
+
+  const toggleTicketStatus = async () => {
+    try {
+      const res = await API.put(`/support/toggle-status/${selectedUser._id}`);
+      setIsClosed(res.data.closed);
+    } catch (err) {
+      console.error('Failed to toggle ticket status:', err);
     }
   };
 
@@ -101,6 +121,7 @@ const SupportChat = ({ selectedUser, onBack }) => {
           <div className={styles.username}>{selectedUser.name}</div>
           <div className={styles.email}>{selectedUser.email}</div>
         </div>
+  
       </div>
 
       <div className={styles.messageArea}>
@@ -112,13 +133,8 @@ const SupportChat = ({ selectedUser, onBack }) => {
             : '/default-avatar.png';
 
           return (
-            <div
-              key={i}
-              className={`${styles.messageRow} ${isAdmin ? styles.user : styles.admin}`}
-            >
-              {!isAdmin && (
-                <img src={senderImage} alt="avatar" className={styles.avatar} />
-              )}
+            <div key={i} className={`${styles.messageRow} ${isAdmin ? styles.user : styles.admin}`}>
+              {!isAdmin && <img src={senderImage} alt="avatar" className={styles.avatar} />}
               <div className={styles.bubbleWrapper}>
                 {Array.isArray(m.image) && m.image.length > 0 && (
                   <div className={styles.imageGroup}>
@@ -132,32 +148,21 @@ const SupportChat = ({ selectedUser, onBack }) => {
                     ))}
                   </div>
                 )}
-
                 {m.content && (
                   <div className={styles.bubble}>
                     {m.content}
                     <span className={styles.time}>
-                      {new Date(m.createdAt).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
+                      {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
                 )}
-
                 {!m.content && m.image?.length > 0 && (
                   <span className={styles.time}>
-                    {new Date(m.createdAt).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
+                    {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 )}
               </div>
-
-              {isAdmin && (
-                <img src={senderImage} alt="avatar" className={styles.avatar} />
-              )}
+              {isAdmin && <img src={senderImage} alt="avatar" className={styles.avatar} />}
             </div>
           );
         })}
@@ -166,38 +171,33 @@ const SupportChat = ({ selectedUser, onBack }) => {
 
       {file && (
         <div className={styles.previewWrapper}>
-          <img
-            src={URL.createObjectURL(file)}
-            alt="preview"
-            className={styles.previewImage}
-          />
+          <img src={URL.createObjectURL(file)} alt="preview" className={styles.previewImage} />
           <button onClick={() => setFile(null)} className={styles.removeImage}>
             <FaTimes />
           </button>
         </div>
       )}
 
-      <div className={styles.inputSection}>
-        <input
-          type="text"
-          value={msg}
-          onChange={(e) => setMsg(e.target.value)}
-          placeholder="Type a message..."
-          className={styles.inputField}
-        />
-        <label className={styles.uploadIcon}>
-          <FaImage />
+      {isClosed ? (
+        <div className={styles.closedNotice}>This ticket is closed.</div>
+      ) : (
+        <div className={styles.inputSection}>
           <input
-            type="file"
-            hidden
-            accept="image/*"
-            onChange={(e) => setFile(e.target.files[0])}
+            type="text"
+            value={msg}
+            onChange={(e) => setMsg(e.target.value)}
+            placeholder="Type a message..."
+            className={styles.inputField}
           />
-        </label>
-        <button onClick={handleSend} className={styles.sendButton}>
-          <FaPaperPlane />
-        </button>
-      </div>
+          <label className={styles.uploadIcon}>
+            <FaImage />
+            <input type="file" hidden accept="image/*" onChange={(e) => setFile(e.target.files[0])} />
+          </label>
+          <button onClick={handleSend} className={styles.sendButton}>
+            <FaPaperPlane />
+          </button>
+        </div>
+      )}
     </div>
   );
 };

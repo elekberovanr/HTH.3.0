@@ -5,35 +5,14 @@
   top: 0;
   z-index: 1000;
   width: 100%;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-
-  a{
-    text-decoration: none;
-  }
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.themeToggle {
-  background: none;
-  border: none;
-  font-size: 20px;
-  color: white;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  transition: transform 0.2s ease;
-}
-
-.themeToggle:hover {
-  transform: scale(1.1);
-}
-
-
-.container {
+.nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px;
-  flex-wrap: wrap;
+  padding: 12px 16px;
 }
 
 .logoWrap {
@@ -41,38 +20,37 @@
   align-items: center;
   gap: 8px;
   text-decoration: none;
-  overflow: hidden;
+  color: white;
 }
 
 .logo {
-  height: 36px;
-  width: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
 }
 
 .title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
-  color: white;
 }
 
-.desktopNav {
+.navLinks {
   display: flex;
-  gap: 24px;
+  gap: 20px;
   align-items: center;
 }
 
-.navItem {
-  color: white;
-  text-decoration: none;
+.link {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-weight: 500;
+  color: white;
+  text-decoration: none;
+  font-size: 15px;
   position: relative;
 }
 
-.navItem:hover {
+.link:hover {
   opacity: 0.8;
 }
 
@@ -80,18 +58,13 @@
   position: absolute;
   top: -6px;
   right: -10px;
-  background-color: red;
+  background: red;
   color: white;
   font-size: 11px;
-  font-weight: bold;
-  padding: 2px 6px;
+  padding: 2px 5px;
   border-radius: 50%;
   line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
-
 
 .right {
   display: flex;
@@ -100,89 +73,89 @@
 }
 
 .icon {
+  font-size: 20px;
   color: white;
-  font-size: 22px;
 }
 
 .profileImage {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+.menuToggle {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  left: 8px;
+  right: 8px;
+  margin: 0 auto;
+  background-color: #1b4b43;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: slideDown 0.3s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+}
+
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .logoutBtn {
   background: none;
   border: none;
   color: white;
-  font-size: 22px;
+  font-size: 15px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   cursor: pointer;
 }
 
-.logoutBtn:hover{
-  color: brown;
+.logoutBtn:hover {
+  color: #f88;
 }
 
-.menuToggle {
-  display: none;
+.themeToggle {
   background: none;
   border: none;
   color: white;
-  font-size: 24px;
-}
-
-.mobileNav {
-  display: flex;
-  flex-direction: column;
-  background-color: #1b4b43;
-  padding: 12px 20px;
-  gap: 12px;
-}
-
-.dropdownWrapper {
-  position: relative;
-}
-
-.dropdownContent {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  padding: 10px;
-  display: none;
-  z-index: 1000;
-  border-radius: 6px;
-  min-width: 160px;
-}
-
-.dropdownWrapper:hover .dropdownContent {
-  display: block;
-}
-
-.header {
-  background-color: #1b4b43;
-  color: white;
+  font-size: 18px;
+  cursor: pointer;
 }
 
 .dark .header {
   background-color: #0f2622;
-  color: #f0f0f0;
+  color: #eee;
 }
 
-.dark .navItem,
+.dark .link,
 .dark .title,
-.dark .logoutBtn,
-.dark .icon {
-  color: #f0f0f0;
+.dark .icon,
+.dark .logoutBtn {
+  color: #eee;
 }
 
-
-
-@media (max-width: 768px) {
-  .desktopNav {
-    display: none;
-  }
-
-  .menuToggle {
-    display: block;
-  }
+.dark .dropdownMenu {
+  background-color: #0f2622;
 }

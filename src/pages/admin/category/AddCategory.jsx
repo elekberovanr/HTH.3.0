@@ -1,4 +1,4 @@
-// src/pages/admin/categories/AddCategory.jsx
+
 import React, { useEffect, useState } from 'react';
 import styles from './AddCategory.module.css';
 import axios from '../../../services/api';
@@ -59,7 +59,7 @@ const AddCategory = () => {
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>Kateqoriyalar</h2>
+      <h2 className={styles.title}>Categories</h2>
 
       <form onSubmit={handleSubmit} className={styles.form}>
         <input
@@ -70,14 +70,14 @@ const AddCategory = () => {
           className={styles.input}
         />
         <button type="submit" className={styles.addBtn} disabled={loading}>
-          {editId ? 'Yadda saxla' : 'Əlavə et'}
+          {editId ? 'Yadda saxla' : 'Add'}
         </button>
       </form>
 
       <div className={styles.tableWrapper}>
         <ul className={styles.table}>
           <li className={styles.headerRow}>
-            <span className={styles.colTitle}>Kateqoriya</span>
+            <span className={styles.colTitle}>Category</span>
             <span className={styles.colActions}></span>
           </li>
           {categories.map((cat) => (

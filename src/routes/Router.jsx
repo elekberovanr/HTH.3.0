@@ -18,6 +18,7 @@ import UserSupport from '../pages/support/UserSupport';
 import SearchPage from '../pages/searchPage/SearchPage';
 import SearchResults from '../components/search/SearchResults';
 import NotFoundPage from '../pages/notFoundPage/NotFoundPage';
+import DonatePage from '../pages/donatePage/DonatePage';
 
 const Router = () => {
   return (
@@ -39,6 +40,7 @@ const Router = () => {
           <Route path="/support" element={<UserSupport/>} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="results" element={<SearchResults />} />
+          <Route path="/donation" element={<DonatePage/>} />
           <Route path="*" element={<NotFoundPage/>} />
         </Route>
       </Routes>

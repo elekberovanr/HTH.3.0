@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './UserSupport.module.css';
 import API from '../../services/api';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { io } from 'socket.io-client';
 import { FaPaperPlane, FaImage, FaTimes } from 'react-icons/fa';
 import adminImage from '../../assets/admin-default.png';
@@ -14,7 +14,10 @@ const UserSupport = () => {
   const [messages, setMessages] = useState([]);
   const [msg, setMsg] = useState('');
   const [file, setFile] = useState(null);
+  const [isClosed, setIsClosed] = useState(false);
   const bottomRef = useRef();
+  const dispatch = useDispatch();
+  
 
   useEffect(() => {
     if (!user?._id) return;
@@ -38,31 +41,38 @@ const UserSupport = () => {
       }
     };
 
+    const handleTicketStatus = (data) => {
+      setIsClosed(data.closed);
+    };
+
     socket.on('newMessage', handleMessage);
+    socket.on('ticketStatusChanged', handleTicketStatus);
 
     return () => {
       socket.off('newMessage', handleMessage);
+      socket.off('ticketStatusChanged', handleTicketStatus);
     };
   }, [user]);
 
   const fetchMessages = async () => {
     try {
       const res = await API.get('/support/user');
-      setMessages(res.data);
+      setMessages(res.data.messages || []);
+      setIsClosed(res.data.isClosed ?? false);
     } catch (err) {
       console.error('Mesajlar yüklənmədi:', err.response?.data || err.message);
     }
   };
 
-  const markMessagesAsRead = async () => {
-  try {
-    await API.put(`/support/mark-read/${user._id}`, { chatWith: null });
-    dispatch(resetUnread(user._id));
-  } catch (err) {
-    console.error('Mesajlar oxundu kimi işarələnə bilmədi:', err.message);
-  }
-};
 
+  const markMessagesAsRead = async () => {
+    try {
+      await API.put(`/support/mark-read/${user._id}`, { chatWith: null });
+      dispatch(resetUnread(user._id));
+    } catch (err) {
+      console.error('Mesajlar oxundu kimi işarələnə bilmədi:', err.message);
+    }
+  };
 
   const handleSend = async () => {
     if (!msg.trim() && !file) return;
@@ -155,28 +165,32 @@ const UserSupport = () => {
         </div>
       )}
 
-      <div className={styles.inputArea}>
-        <label className={styles.imageLabel}>
-          <FaImage />
+      {isClosed ? (
+        <div className={styles.closedNotice}>Bu söhbət admin tərəfindən bağlanıb.</div>
+      ) : (
+        <div className={styles.inputArea}>
+          <label className={styles.imageLabel}>
+            <FaImage />
+            <input
+              type="file"
+              hidden
+              accept="image/*"
+              onChange={(e) => setFile(e.target.files[0])}
+            />
+          </label>
           <input
-            type="file"
-            hidden
-            accept="image/*"
-            onChange={(e) => setFile(e.target.files[0])}
+            type="text"
+            value={msg}
+            onChange={(e) => setMsg(e.target.value)}
+            placeholder="Yazın..."
+            className={styles.input}
+            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
           />
-        </label>
-        <input
-          type="text"
-          value={msg}
-          onChange={(e) => setMsg(e.target.value)}
-          placeholder="Type..."
-          className={styles.input}
-          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-        />
-        <button className={styles.sendButton} onClick={handleSend}>
-          <FaPaperPlane />
-        </button>
-      </div>
+          <button className={styles.sendButton} onClick={handleSend}>
+            <FaPaperPlane />
+          </button>
+        </div>
+      )}
     </div>
   );
 };

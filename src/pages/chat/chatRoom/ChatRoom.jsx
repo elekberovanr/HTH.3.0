@@ -117,7 +117,7 @@ const ChatRoom = () => {
   };
 
   if (!user || !user._id || !selectedChat || !selectedChat._id) {
-    return <div className={styles.empty}>Loading chat...</div>;
+    return <div className={styles.empty}>Select a chat...</div>;
   }
 
   return (

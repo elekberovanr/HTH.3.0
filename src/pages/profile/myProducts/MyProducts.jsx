@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import API from '../../../services/api';
 import styles from './MyProducts.module.css';
 import { Link } from 'react-router-dom';
-import { FiTrash2 } from 'react-icons/fi';
+import { FiTrash2, FiMoreVertical } from 'react-icons/fi';
 import { BiPencil } from 'react-icons/bi';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -15,6 +15,7 @@ const MyProducts = () => {
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
   const [toDeleteId, setToDeleteId] = useState(null);
+  const [openMenu, setOpenMenu] = useState(null);
   const theme = useSelector((state) => state.theme.mode);
 
   useEffect(() => {
@@ -34,6 +35,7 @@ const MyProducts = () => {
   const askDelete = (id) => {
     setToDeleteId(id);
     setShowDialog(true);
+    setOpenMenu(null);
   };
 
   const confirmDelete = async () => {
@@ -66,29 +68,33 @@ const MyProducts = () => {
           ) : (
             products.map((product) => (
               <div key={product._id} className={styles.card}>
-                <img
-                  src={`http://localhost:5555/uploads/${product.images?.[0] || product.image}`}
-                  alt={product.title}
-                  className={styles.image}
-                />
+                <div className={styles.imageWrapper}>
+                  <img
+                    src={`http://localhost:5555/uploads/${product.images?.[0] || product.image}`}
+                    alt={product.title}
+                    className={styles.image}
+                  />
+                  <button className={styles.menuBtn} onClick={() => setOpenMenu(openMenu === product._id ? null : product._id)}>
+                    <FiMoreVertical />
+                  </button>
+                  {openMenu === product._id && (
+                    <div className={styles.dropdownMenu}>
+                      <Link to={`/profile/edit/${product._id}`} className={styles.dropdownItem}>
+                        <BiPencil /> Edit
+                      </Link>
+                      <button onClick={() => askDelete(product._id)} className={styles.dropdownItem}>
+                        <FiTrash2 /> Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
+
                 <div className={styles.info}>
-                  <span className={styles.productTitle}>{product.title}</span>
+                  <h3 className={styles.productTitle}>{product.title}</h3>
                   <p className={styles.desc}>{product.description?.slice(0, 60)}...</p>
-                  <div className={styles.actions}>
-                    <Link to={`/profile/edit/${product._id}`} className={styles.editBtn}>
-                      <BiPencil /> Edit
-                    </Link>
-                    <Link to={`/product/${product._id}`} className={styles.editBtn}>
-                      Read more..
-                    </Link>
-                    <button
-                      className={styles.deleteBtn}
-                      onClick={() => askDelete(product._id)}
-                      title="Delete product"
-                    >
-                      <FiTrash2 />
-                    </button>
-                  </div>
+                  <Link to={`/product/${product._id}`} className={styles.readMoreBtn}>
+                    Read more..
+                  </Link>
                 </div>
               </div>
             ))

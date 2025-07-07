@@ -4,6 +4,7 @@ import styles from './SearchPage.module.css';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ProductCard from '../../components/product/ProductCard';
 import SearchBar from '../../components/search/SearchBar';
+import CategoryDropdown from '../category/CategoryDropdown';
 import { fetchProducts } from '../../redux/reducers/productSlice';
 
 const SearchPage = () => {
@@ -37,8 +38,9 @@ const SearchPage = () => {
 
   return (
     <div className={styles.searchPage}>
-      <div className={styles.topSection}>
-        <h2 className={styles.title}>Search Results</h2>
+      <h2 className={styles.title}>Search Results</h2>
+      <div className={styles.controls}>
+        <CategoryDropdown />
         <SearchBar />
       </div>
 

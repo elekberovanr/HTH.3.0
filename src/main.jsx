@@ -7,6 +7,8 @@ import { BrowserRouter } from 'react-router-dom';
 
 import Router from './routes/Router';
 import AdminRouter from './routes/AdminRoutes';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const isAdminPath = window.location.pathname.startsWith('/admin');
 
@@ -14,7 +16,10 @@ createRoot(document.getElementById('root')).render(
   <Provider store={store}>
     <StrictMode>
       <BrowserRouter>
-        {isAdminPath ? <AdminRouter /> : <Router />}
+        <>
+          {isAdminPath ? <AdminRouter /> : <Router />}
+          <ToastContainer position="top-center" autoClose={2500} />
+        </>
       </BrowserRouter>
     </StrictMode>
   </Provider>

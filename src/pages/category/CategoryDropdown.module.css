@@ -1,32 +1,85 @@
-:root {
-  --dropdown-bg: #ffffff;
-  --item-color: #1b4b43;
-  --item-hover: #f0f0f0;
+.dropdownContainer {
+  position: relative;
+  width: 180px;
+  user-select: none;
 }
 
-[data-theme='dark'] {
-  --dropdown-bg: #2a3b39;
-  --item-color: #8de0d4;
-  --item-hover: #3a4f4c;
+.dropdownHeader {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.2s;
 }
 
-.dropdown {
-  background-color: var(--dropdown-bg);
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 8px 0;
-  min-width: 160px;
-  transition: background-color 0.3s ease;
+.dropdownHeader:hover {
+  border-color: var(--primary-color);
+}
+
+.icon {
+  font-size: 18px;
+}
+
+.dropdownList {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  right: 0;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  z-index: 100;
+  max-height: 240px;
+  overflow-y: auto;
+  animation: fadeIn 0.2s ease-in-out;
 }
 
 .item {
-  padding: 10px 16px;
+  padding: 10px 14px;
+  font-size: 14px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-  font-weight: 500;
-  color: var(--item-color);
+  color: var(--text-color);
+  transition: background-color 0.2s, color 0.2s;
 }
 
 .item:hover {
-  background-color: var(--item-hover);
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dark .dropdownHeader,
+.dark .dropdownList {
+  background-color: #1e2e2a;
+  color: #eee;
+  border-color: var(--border-color);
+}
+
+.dark .item:hover,
+.dark .active {
+  background-color: #295f58;
+  color: white;
 }

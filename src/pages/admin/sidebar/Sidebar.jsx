@@ -36,9 +36,6 @@ const Sidebar = () => {
           <NavLink to="/admin/payments" className={({ isActive }) => isActive ? styles.active : ''}>
             <MdPayment /> Payments
           </NavLink>
-          <NavLink to="/admin/notifications" className={({ isActive }) => isActive ? styles.active : ''}>
-            <MdNotifications /> Notifications
-          </NavLink>
           <NavLink to="/admin/logout" className={({ isActive }) => isActive ? styles.active : ''}>
             <MdOutlineLogout /> Logout
           </NavLink>

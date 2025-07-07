@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import API from '../../../services/api';
 import styles from './UsersList.module.css';
-import { FiEdit3, FiTrash2, FiSave } from 'react-icons/fi';
+import { FiEdit3, FiTrash2, FiSave, FiSearch } from 'react-icons/fi';
 
 const UsersList = () => {
   const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [editUserId, setEditUserId] = useState(null);
   const [editData, setEditData] = useState({ username: '', email: '', password: '' });
 
@@ -13,12 +15,21 @@ const UsersList = () => {
       try {
         const res = await API.get('/users');
         setUsers(res.data);
+        setFilteredUsers(res.data);
       } catch (err) {
         console.error('Failed to fetch users');
       }
     };
     fetchUsers();
   }, []);
+
+  useEffect(() => {
+    const term = searchTerm.toLowerCase();
+    const filtered = users.filter((user) =>
+      user.email?.toLowerCase().includes(term)
+    );
+    setFilteredUsers(filtered);
+  }, [searchTerm, users]);
 
   const handleEdit = (user) => {
     setEditUserId(user._id);
@@ -63,6 +74,18 @@ const UsersList = () => {
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>User Management</h2>
+
+      <div className={styles.searchBar}>
+        <FiSearch className={styles.searchIcon} />
+        <input
+          type="text"
+          placeholder="Search by email..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className={styles.searchInput}
+        />
+      </div>
+
       <div className={styles.tableWrapper}>
         <div className={`${styles.row} ${styles.header}`}>
           <div>Profile</div>
@@ -71,7 +94,7 @@ const UsersList = () => {
           <div>Password</div>
           <div>Actions</div>
         </div>
-        {users.map((user) => (
+        {filteredUsers.map((user) => (
           <div className={styles.row} key={user._id}>
             {editUserId === user._id ? (
               <>

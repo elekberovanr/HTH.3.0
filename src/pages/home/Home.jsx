@@ -7,6 +7,7 @@ import HeroSection from './heroSection/HeroSection';
 import WhatsNew from './whatsNew/WhatsNew';
 import CategoriesSection from './categoriesSection/CateoriesSection';
 import UsersSection from './userSection/UsersSection';
+import Donate from './donate/Donate';
 
 const Home = () => {
   useEffect(() => {
@@ -24,6 +25,9 @@ const Home = () => {
       </div>
       <div className={styles.sectionSpacing}>
         <UsersSection />
+      </div>
+      <div className={styles.sectionSpacing}>
+        <Donate/>
       </div>
       <div className={styles.sectionSpacing}>
         <Products />
