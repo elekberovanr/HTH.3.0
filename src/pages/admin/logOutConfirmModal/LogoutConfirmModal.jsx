@@ -2,12 +2,15 @@ import React from 'react';
 import styles from './LogoutConfirmModal.module.css';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { logout } from '../../../redux/reducers/userSlice';
 
 const LogoutConfirmModal = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    dispatch(logout()); // Redux'dan user silinir
     toast.success('Logged out successfully!');
     navigate('/login');
   };

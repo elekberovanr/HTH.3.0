@@ -1,13 +1,35 @@
+:root {
+  --card-bg: #ffffff;
+  --text-color: #1b1b1b;
+  --text-muted: #666666;
+  --primary-color: #1b4b43;
+  --button-bg: #1b4b43;
+  --button-bg-hover: #163f38;
+  --border-color: #dddddd;
+  --cancel-color: #999999;
+}
+
+[data-theme='dark'] {
+  --card-bg: #1f2b29;
+  --text-color: #f2f2f2;
+  --text-muted: #aaaaaa;
+  --primary-color: #8de0d4;
+  --button-bg: #295f58;
+  --button-bg-hover: #1e4a43;
+  --border-color: #334543;
+  --cancel-color: #555555;
+}
+
 .container {
   min-height: 90vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f1f5f9;
+  background-color: var(--bg-color);
 }
 
 .card {
-  background: #fff;
+  background: var(--card-bg);
   padding: 2.5rem;
   border-radius: 12px;
   width: 100%;
@@ -18,7 +40,7 @@
 .title {
   text-align: center;
   font-size: 24px;
-  color: #1f2937;
+  color: var(--text-color);
   margin-bottom: 1.5rem;
 }
 
@@ -36,9 +58,11 @@
 .inputGroup select {
   width: 100%;
   padding: 10px 14px 10px 38px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--input-border);
   border-radius: 8px;
   font-size: 15px;
+  background: transparent;
+  color: var(--text-color);
 }
 
 .inputGroup select {
@@ -49,19 +73,20 @@
   position: absolute;
   top: 10px;
   left: 10px;
-  color: #94a3b8;
+  color: var(--icon-color);
 }
 
 .button {
-  background-color: #73a8a5;
+  background-color: var(--button-bg);
   color: white;
   padding: 10px;
   border: none;
   font-size: 16px;
   border-radius: 8px;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 
 .button:hover {
-  background-color: #5b8c89;
+  background-color: var(--button-hover);
 }

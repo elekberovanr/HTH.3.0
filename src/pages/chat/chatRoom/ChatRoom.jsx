@@ -32,9 +32,7 @@ const ChatRoom = () => {
   const recipient = selectedChat?.participants?.find(p => p._id !== user?._id);
 
   useEffect(() => {
-    if (user && user._id) {
-      dispatch(fetchChats(user._id));
-    }
+    if (user && user._id) dispatch(fetchChats(user._id));
   }, [dispatch, user]);
 
   useEffect(() => {
@@ -45,12 +43,12 @@ const ChatRoom = () => {
 
   useEffect(() => {
     const markRead = async () => {
-      if (!selectedChat || !selectedChat._id || !user || !user._id) return;
+      if (!selectedChat || !selectedChat._id || !user?._id) return;
       try {
         await API.put(`/chat/read/${user._id}`, { chatId: selectedChat._id });
         dispatch(markChatAsRead(selectedChat._id));
       } catch (err) {
-        console.error('Read marking failed:', err);
+        console.error('Mark as read failed:', err);
       }
     };
     markRead();
@@ -77,6 +75,7 @@ const ChatRoom = () => {
 
   useEffect(() => {
     socket.on('newMessage', (msg) => {
+      if (msg.sender?._id === user?._id) return; // öz mesajını alma
       if (msg.chat === selectedChat?._id) {
         setMessages((prev) => [...prev, msg]);
         dispatch(markChatAsRead(selectedChat._id));
@@ -86,8 +85,7 @@ const ChatRoom = () => {
     });
 
     return () => socket.off('newMessage');
-  }, [selectedChat, user]);
-
+  }, [selectedChat, user, dispatch]);
 
   useEffect(() => {
     chatBoxRef.current?.scrollTo(0, chatBoxRef.current.scrollHeight);
@@ -103,7 +101,15 @@ const ChatRoom = () => {
 
     try {
       const res = await API.post('/chat/message', formData);
-      socket.emit('sendMessage', res.data);
+      const msgData = res.data;
+
+      setMessages((prev) => [...prev, msgData]);
+
+      socket.emit('sendMessage', {
+        ...msgData,
+        receiverId: recipient._id,
+      });
+
       setNewMsg('');
       setFile(null);
     } catch (err) {

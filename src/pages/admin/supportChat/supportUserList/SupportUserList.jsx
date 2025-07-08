@@ -14,7 +14,15 @@ const SupportUserList = ({ onSelectUser, selectedUser }) => {
     const fetchUsers = async () => {
       try {
         const res = await API.get('/support/admin');
-        setUsers(res.data);
+
+        // Sıralama: en son mesaja görə
+        const sorted = res.data.sort((a, b) => {
+          const aTime = new Date(a.lastMessage?.createdAt || 0);
+          const bTime = new Date(b.lastMessage?.createdAt || 0);
+          return bTime - aTime;
+        });
+
+        setUsers(sorted);
       } catch (err) {
         console.error('Failed to fetch support users:', err);
       }
@@ -23,6 +31,7 @@ const SupportUserList = ({ onSelectUser, selectedUser }) => {
     fetchUsers();
   }, []);
 
+
   const handleSelect = (user) => {
     dispatch(setSelectedChat({ _id: user._id }));
     onSelectUser(user);
@@ -30,45 +39,55 @@ const SupportUserList = ({ onSelectUser, selectedUser }) => {
 
   return (
     <div className={styles.userList}>
-      {users.map((user) => {
-        const unreadCount = globalNotifications[user._id] || 0;
-        const imageSrc = user.profileImage
-          ? user.profileImage.startsWith('http')
-            ? user.profileImage
-            : `http://localhost:5555/uploads/${user.profileImage}`
-          : defaultAvatar;
+      {users
+        .slice() // orijinalı dəyişməmək üçün kopya
+        .sort((a, b) => {
+          const timeA = new Date(a.lastMessage?.createdAt || 0).getTime();
+          const timeB = new Date(b.lastMessage?.createdAt || 0).getTime();
+          return timeB - timeA; // En yeni başda
+        })
+        .map((user) => {
+          const unreadCount = globalNotifications[user._id] || 0;
+          const imageSrc = user.profileImage
+            ? user.profileImage.startsWith('http')
+              ? user.profileImage
+              : `http://localhost:5555/uploads/${user.profileImage}`
+            : defaultAvatar;
 
-        return (
-          <div
-            key={user._id}
-            className={`${styles.userItem} ${selectedUser?._id === user._id ? styles.active : ''}`}
-            onClick={() => handleSelect(user)}
-          >
-            <img
-              src={imageSrc}
-              alt="profile"
-              className={styles.avatar}
-              onError={(e) => (e.target.src = defaultAvatar)}
-            />
-            <div className={styles.details}>
-              <div className={styles.nameWrapper}>
-                <div className={styles.nameEmail}>
-                  <div className={styles.name}>{user.name}</div>
-                  <div className={styles.email}>{user.email}</div>
+          return (
+            <div
+              key={user._id}
+              className={`${styles.userItem} ${selectedUser?._id === user._id ? styles.active : ''}`}
+              onClick={() => handleSelect(user)}
+            >
+              <img
+                src={imageSrc}
+                alt="profile"
+                className={styles.avatar}
+                onError={(e) => (e.target.src = defaultAvatar)}
+              />
+              <div className={styles.details}>
+                <div className={styles.nameWrapper}>
+                  <div className={styles.nameEmail}>
+                    <div className={styles.name}>{user.name}</div>
+                    <div className={styles.email}>{user.email}</div>
+                  </div>
+                  {unreadCount > 0 && (
+                    <span className={styles.notificationBadge}>
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
                 </div>
-                {unreadCount > 0 && (
-                  <span className={styles.notificationBadge}>
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </span>
-                )}
+                <div className={styles.lastMessage}>
+                  {user.lastMessage?.content || (user.lastMessage?.image ? '📷 Photo' : '')}
+                </div>
               </div>
-              <div className={styles.lastMessage}> </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
     </div>
   );
+
 };
 
 export default SupportUserList;

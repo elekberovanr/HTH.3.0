@@ -17,7 +17,7 @@ const chatSlice = createSlice({
     selectedChatId: null,
     loading: false,
     error: null,
-    notifications: {}, // ✅ for support users only
+    notifications: {},
   },
   reducers: {
     setSelectedChat: (state, action) => {
@@ -33,6 +33,9 @@ const chatSlice = createSlice({
       const chat = state.chatList.find((c) => c._id === chatId);
       if (chat) {
         chat.unreadCount = 0;
+      }
+      if (state.notifications[chatId]) {
+        state.notifications[chatId] = 0;
       }
     },
     incrementUnread: (state, action) => {
@@ -66,6 +69,15 @@ const chatSlice = createSlice({
       .addCase(fetchChats.fulfilled, (state, action) => {
         state.loading = false;
         state.chatList = action.payload;
+
+        // ✅ unreadCount-ları notifications obyektinə kopyala
+        const newNotifications = {};
+        action.payload.forEach((chat) => {
+          if (chat.unreadCount && chat.unreadCount > 0) {
+            newNotifications[chat._id] = chat.unreadCount;
+          }
+        });
+        state.notifications = newNotifications;
       })
       .addCase(fetchChats.rejected, (state, action) => {
         state.loading = false;
